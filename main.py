@@ -11,40 +11,30 @@ def main():
     try:
         world, blueprint_library, traffic_manager = setup_world.setup_carla()
         
-        #settings = world.get_settings()
-        #settings.fixed_delta_seconds = 2
-        #world.apply_settings(settings)
-
         vehicle = spawn_vehicle.spawn_vehicle(world, blueprint_library)
         actor_list.append(vehicle)
         print(f"Vehicle: {vehicle}")
         
+        
         # Ignore all the red ligths
         traffic_manager.ignore_lights_percentage(vehicle, 100)
         
-        environment.weather_environment(world, 
-                                        precip_deposits=10,
-                                        cloudiness=5,
-                                        precipitation=10,
-                                        sun_angle=10,
-                                        fog=0,
-                                        wetness=5,
-                                        wind=5,
-                                        air_pollution=0,
-                                        dust_storm=0)
+        # "DayClear" | "DayCloudy" | "DayRain" | "NigthCloudy"
+        environment.weather_environment("DayClear", world)
         
-        camera_rgb = spawn_sensor.spawn_camera('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
+        
+        camera_rgb = spawn_sensor.spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
         actor_list.append(camera_rgb)
         print(f"Camera RGB: {camera_rgb}")
 
-        camera_depth = spawn_sensor.spawn_camera('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
+        camera_depth = spawn_sensor.spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
         actor_list.append(camera_depth)
         print(f"Camera Depth: {camera_depth}")
         
-        camera_lidar = spawn_sensor.spawn_sensor('sensor.lidar.ray_cast', world, blueprint_library, vehicle)
+        # "voxel_grid" | "real_lidar"
+        camera_lidar = spawn_sensor.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle, "real_lidar")
         actor_list.append(camera_lidar)
         print(f"Camera Lidar: {camera_lidar}")
-        
         
         
         camera_lidar.listen(lambda image: image.save_to_disk('_out/lidar/%06d.ply' % image.frame))
@@ -55,8 +45,7 @@ def main():
         camera_depth.listen(lambda image: image.save_to_disk('_out/depth/%06d.png' % image.frame, cc))
         
         
-        
-        time.sleep(1)
+        time.sleep(3)
 
     finally:
         for actor in actor_list:
