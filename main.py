@@ -45,7 +45,7 @@ def main():
         camera_depth.listen(lambda image: image.save_to_disk('_out/depth/%06d.png' % image.frame, cc))
         
         
-        time.sleep(3)
+        time.sleep(30)
 
     finally:
         for actor in actor_list:
