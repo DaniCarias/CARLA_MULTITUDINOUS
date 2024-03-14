@@ -2,6 +2,7 @@ import os
 from os import mkdir, listdir
 from shutil import move
 import math
+#from utils import remove_corrupts_imgs
 
 data_dir = "../data"
 out_dir = "../_out"
@@ -20,6 +21,10 @@ mkdir(test_path) if not os.path.exists(test_path) else None
 for sensor_folder in sensor_folders:
     mkdir(f"{test_path}/{sensor_folder}") if not os.path.exists(f"{test_path}/{sensor_folder}") else None
     mkdir(f"{train_path}/{sensor_folder}") if not os.path.exists(f"{train_path}/{sensor_folder}") else None
+
+
+#remove_corrupts_imgs.remove_corrupt_images()
+
 
 # save the depth, rgb and lidar
 imgs_depth = [f for f in sorted(listdir(f"{out_dir}/depth"))]
@@ -44,9 +49,9 @@ print(f"imgs_test_rgb: {len(imgs_test_rgb)}")
 print(f"imgs_test_lidar: {len(imgs_test_lidar)}")
 
 
-imgs_train_depth = imgs_depth[num_samples_test:num_samples_train]
-imgs_train_rgb = imgs_rgb[num_samples_test:num_samples_train]
-imgs_train_lidar = imgs_lidar[num_samples_test:num_samples_train]
+imgs_train_depth = imgs_depth[num_samples_test:]
+imgs_train_rgb = imgs_rgb[num_samples_test:]
+imgs_train_lidar = imgs_lidar[num_samples_test:]
 print(f"\n-----------TRAIN-----------")
 print(f"imgs_train_depth: {len(imgs_train_depth)}")
 print(f"imgs_train_rgb: {len(imgs_train_rgb)}")
