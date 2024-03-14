@@ -9,20 +9,20 @@ attributes = {
         'rotation_frequency': '20',         # Velocidade de rotação
         'upper_fov': '45',                  # Qual o ângulo do centro para cima
         'lower_fov': '-45',                 # Qual o ângulo do centro para baixo
-        'dropoff_general_rate': '0.1',      # Qual a percentagem de pontos que vai descartar (0.1 tal como a Lidar que vamos usar) -> Colocar a 0 para voxel grid
+        'dropoff_general_rate': '0.1',      # Qual a percentagem de pontos que vai descartar
         'dropoff_intensity_limit': '0.8',   # O que for a baixo do valor de intensidade é descartado -> Colocar a 0 para voxel grid
         'dropoff_zero_intensity': '0.4'     # Se o valor de intensidade for 0 qual a percentagem de descaratar -> Colocar a 1 para voxel grid
     },
     "voxel_grid": {
-        'channels': '64',
-        'range': '10.0',
-        'points_per_second': '1621440',
-        'rotation_frequency': '20',
-        'upper_fov': '45',
-        'lower_fov': '-45',
-        'dropoff_general_rate': '0.1',
-        'dropoff_intensity_limit': '0.8',
-        'dropoff_zero_intensity': '0.4'
+        'channels': '256',
+        'range': '75.0',
+        'points_per_second': '10485760',
+        'rotation_frequency': '20', 
+        'upper_fov': '60',
+        'lower_fov': '-60',
+        'dropoff_general_rate': '0',
+        'dropoff_intensity_limit': '0',
+        'dropoff_zero_intensity': '0'
     }
 }
 
@@ -37,8 +37,9 @@ def set_attributes_lidar(sensor_bp, attribute_type):
 # Atributos da camera RGB o mais parecidos com a camera real
 def set_atributes_rgb(camera_bp):
     camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus 
-    # Opening of the camera lens (fstop) -> ver se é o 2.1 / 4.0 
-    camera_bp.set_attribute('enable_postprocess_effects', 'True') # Efeito de realismo na imagem 
+    camera_bp.set_attribute('enable_postprocess_effects', 'True') # Efeito de realismo na imagem   
+    
+     # Opening of the camera lens (fstop) -> ver se é o 2.1 / 4.0 
 
 
 # Atributos da camera de Depth o mais parecidos com a camera real
