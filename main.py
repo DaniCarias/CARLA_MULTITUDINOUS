@@ -32,7 +32,7 @@ def main():
         print(f"Camera Depth: {camera_depth}")
         
         # "voxel_grid" | "real_lidar"
-        camera_lidar = spawn_sensor.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle, "real_lidar")
+        camera_lidar = spawn_sensor.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle, "voxel_grid")
         actor_list.append(camera_lidar)
         print(f"Camera Lidar: {camera_lidar}")
         
@@ -45,7 +45,7 @@ def main():
         camera_depth.listen(lambda image: image.save_to_disk('_out/depth/%06d.png' % image.frame, cc))
         
         
-        time.sleep(30)
+        time.sleep(8)
 
     finally:
         for actor in actor_list:

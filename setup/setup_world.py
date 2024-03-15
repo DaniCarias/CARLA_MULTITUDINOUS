@@ -17,9 +17,11 @@ def setup_carla():
 
     world = client.get_world()
 
+    """
     if not world.get_map().name == 'Carla/Maps/Town01_Opt':
         print(f"Current world: {world.get_map().name}")
         client.load_world('Town01_Opt')
+    """
         
     # To edit the traffic 
     traffic_manager = client.get_trafficmanager(8000)

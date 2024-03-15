@@ -10,7 +10,7 @@ attributes = {
         'upper_fov': '45',                  # Qual o ângulo do centro para cima
         'lower_fov': '-45',                 # Qual o ângulo do centro para baixo
         'dropoff_general_rate': '0.1',      # Qual a percentagem de pontos que vai descartar
-        'dropoff_intensity_limit': '0.8',   # O que for a baixo do valor de intensidade é descartado -> Colocar a 0 para voxel grid
+        'dropoff_intensity_limit': '0.8',   # O que for a baixo do valor de intensidade é descartado 
         'dropoff_zero_intensity': '0.4'     # Se o valor de intensidade for 0 qual a percentagem de descaratar -> Colocar a 1 para voxel grid
     },
     "voxel_grid": {
@@ -39,6 +39,7 @@ def set_atributes_rgb(camera_bp):
     camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus 
     camera_bp.set_attribute('enable_postprocess_effects', 'True') # Efeito de realismo na imagem   
     
+    camera_bp.set_attribute('fstop', '1.4')
      # Opening of the camera lens (fstop) -> ver se é o 2.1 / 4.0 
 
 

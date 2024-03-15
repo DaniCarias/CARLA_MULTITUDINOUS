@@ -39,10 +39,10 @@ weather_types = {
         'dust_storm': 0
     },
     "DayRain":{
-        'precip_deposits': 10,
-        'cloudiness': 50,
+        'precip_deposits': 40,
+        'cloudiness': 60,
         'precipitation': 100,
-        'sun_angle': 10,
+        'sun_angle': 40,
         'fog': 0,
         'wetness': 100,
         'wind': 100,
