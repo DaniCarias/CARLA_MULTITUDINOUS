@@ -3,6 +3,7 @@ from setup import setup_world, environment
 from spawn import spawn_sensor, spawn_vehicle
 import carla
 
+
 def main():
     actor_list = []
     IMG_WIDTH = 1280
@@ -10,6 +11,12 @@ def main():
 
     try:
         world, blueprint_library, traffic_manager = setup_world.setup_carla()
+        
+        # No rendering mode
+        settings = world.get_settings()
+        settings.no_rendering_mode = True
+        world.apply_settings(settings)
+
         
         vehicle = spawn_vehicle.spawn_vehicle(world, blueprint_library)
         actor_list.append(vehicle)
@@ -35,17 +42,17 @@ def main():
         camera_lidar = spawn_sensor.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle, "voxel_grid")
         actor_list.append(camera_lidar)
         print(f"Camera Lidar: {camera_lidar}")
+
+
+        camera_lidar.listen(lambda image: image.save_to_disk('_out/lidar/%06d' % image.frame + f"_{time.strftime('%d%m%Y_%H%M%S')}.ply"))
         
-        
-        camera_lidar.listen(lambda image: image.save_to_disk('_out/lidar/%06d.ply' % image.frame))
-        
-        camera_rgb.listen(lambda image: image.save_to_disk('_out/rgb/%06d.png' % image.frame))
+        camera_rgb.listen(lambda image: image.save_to_disk('_out/rgb/%06d' % image.frame + f"_{time.strftime('%d%m%Y_%H%M%S')}.png"))
     
         cc = carla.ColorConverter.LogarithmicDepth
-        camera_depth.listen(lambda image: image.save_to_disk('_out/depth/%06d.png' % image.frame, cc))
+        camera_depth.listen(lambda image: image.save_to_disk('_out/depth/%06d' % image.frame + f"_{time.strftime('%d%m%Y_%H%M%S')}.png", cc))
         
         
-        time.sleep(8)
+        time.sleep(10)
 
     finally:
         for actor in actor_list:

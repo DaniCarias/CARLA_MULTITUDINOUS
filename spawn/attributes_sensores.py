@@ -36,12 +36,25 @@ def set_attributes_lidar(sensor_bp, attribute_type):
     
 # Atributos da camera RGB o mais parecidos com a camera real
 def set_atributes_rgb(camera_bp):
-    camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus 
-    camera_bp.set_attribute('enable_postprocess_effects', 'True') # Efeito de realismo na imagem   
+    camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus -> Baseado na camera Zed   
+    camera_bp.set_attribute('fstop', f"{0.5}") # Abertura da lente -> 1/2 -> Baseado na camera Zed
     
-    camera_bp.set_attribute('fstop', '1.4')
-     # Opening of the camera lens (fstop) -> ver se é o 2.1 / 4.0 
-
+    # Parece que n ha diferença em ter ou nao estes atributos (ver diferença do kcube em relação ao k)
+    camera_bp.set_attribute('motion_blur_intensity', f"{0}") # Intensidade do efeito de movimento
+    matrix = [[2.12, 0, 640],
+              [0, 2.12, 360],
+              [0,   0,   1]]
+    # focal_length = 2.12   |   # focal_center = IMG_WIDTH(1280)/2 and IMG_HEIGHT(720)/2
+    camera_bp.set_attribute('lens_k', f"{matrix}")
+    camera_bp.set_attribute('lens_kcube', f"{matrix}")
+    
+    
+    #NOVOS ATRIBUTOS
+    camera_bp.set_attribute('iso', f"{1900}") # Sensitivity do sensor -> Baseado na camera Zed
+    #camera_bp.set_attribute('lens_flare_intensity', f"{0.8}") # Intensidade do efeito de lente (flare) -> Não diz no manual
+    #camera_bp.set_attribute('shutter_speed', f"{0.0001}") # Não diz no manual
+    camera_bp.set_attribute('focal_distance', f"{2000}") # Distância a que a profundidade do efeito de campo deve ser nítida. -> Nao tenho a certeza
+    
 
 # Atributos da camera de Depth o mais parecidos com a camera real
 def set_atributes_depth(camera_bp):
