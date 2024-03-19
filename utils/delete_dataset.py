@@ -1,24 +1,23 @@
 import os
-import pandas as pd
 
 def count_imgs_data():
 
-    test_path = "../data/test"
+    validation_path = "../data/validation"
     train_path = "../data/train"
     
-    test_lidar_path = test_path + "/lidar"
-    test_rgb_path = test_path + "/rgb"
-    test_depth_path = test_path + "/depth"
+    validation_lidar_path = validation_path + "/lidar"
+    validation_rgb_path = validation_path + "/rgb"
+    validation_depth_path = validation_path + "/depth"
     train_lidar_path = train_path + "/lidar"
     train_rgb_path = train_path + "/rgb"
     train_depth_path = train_path + "/depth"    
     
-    for f in os.listdir(test_lidar_path):
-        os.remove(os.path.join(test_lidar_path, f))
-    for f in os.listdir(test_rgb_path):
-        os.remove(os.path.join(test_rgb_path, f))
-    for f in os.listdir(test_depth_path):
-        os.remove(os.path.join(test_depth_path, f))
+    for f in os.listdir(validation_lidar_path):
+        os.remove(os.path.join(validation_lidar_path, f))
+    for f in os.listdir(validation_rgb_path):
+        os.remove(os.path.join(validation_rgb_path, f))
+    for f in os.listdir(validation_depth_path):
+        os.remove(os.path.join(validation_depth_path, f))
     for f in os.listdir(train_lidar_path):
         os.remove(os.path.join(train_lidar_path, f))
     for f in os.listdir(train_rgb_path):

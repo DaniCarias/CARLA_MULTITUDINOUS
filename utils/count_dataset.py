@@ -1,14 +1,13 @@
 import os
-import pandas as pd
 
 def count_imgs_data():
 
-    test_path = "../data/test"
+    validation_path = "../data/validation"
     train_path = "../data/train"
 
-    test_lidar = len(os.listdir(test_path + "/lidar"))
-    test_rgb = len(os.listdir(test_path + "/rgb"))
-    test_depth = len(os.listdir(test_path + "/depth"))
+    validation_lidar = len(os.listdir(validation_path + "/lidar"))
+    validation_rgb = len(os.listdir(validation_path + "/rgb"))
+    validation_depth = len(os.listdir(validation_path + "/depth"))
     
     train_lidar = len(os.listdir(train_path + "/lidar"))
     train_rgb = len(os.listdir(train_path + "/rgb"))
@@ -18,11 +17,9 @@ def count_imgs_data():
     print(f"Train RGB: {train_rgb}")
     print(f"Train Depth: {train_depth}")
     print(f"------------")
-    print(f"Test Lidar: {test_lidar}")
-    print(f"Test RGB: {test_rgb}")
-    print(f"Test Depth: {test_depth}")
-    
-    
+    print(f"Validation Lidar: {validation_lidar}")
+    print(f"Validation RGB: {validation_rgb}")
+    print(f"Validation Depth: {validation_depth}")    
     
 if __name__ == "__main__":
     count_imgs_data()
