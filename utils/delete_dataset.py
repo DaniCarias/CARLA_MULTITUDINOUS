@@ -1,33 +1,23 @@
 import os
 
-def count_imgs_data():
+def delete_dataset():
 
-    validation_path = "../data/validation"
-    train_path = "../data/train"
-    
-    validation_lidar_path = validation_path + "/lidar"
-    validation_rgb_path = validation_path + "/rgb"
-    validation_depth_path = validation_path + "/depth"
-    train_lidar_path = train_path + "/lidar"
-    train_rgb_path = train_path + "/rgb"
-    train_depth_path = train_path + "/depth"    
-    
-    for f in os.listdir(validation_lidar_path):
-        os.remove(os.path.join(validation_lidar_path, f))
-    for f in os.listdir(validation_rgb_path):
-        os.remove(os.path.join(validation_rgb_path, f))
-    for f in os.listdir(validation_depth_path):
-        os.remove(os.path.join(validation_depth_path, f))
-    for f in os.listdir(train_lidar_path):
-        os.remove(os.path.join(train_lidar_path, f))
-    for f in os.listdir(train_rgb_path):
-        os.remove(os.path.join(train_rgb_path, f))
-    for f in os.listdir(train_depth_path):
-        os.remove(os.path.join(train_depth_path, f))
-    
-    
+    data_paths = {
+        "train": "../data/train",
+        "validation": "../data/validation",
+        "test": "../data/test",
+    }
+
+    for dataset_type, path in data_paths.items():
+        for subdir in ["lidar", "rgb", "depth"]:
+            subdir_path = os.path.join(path, subdir)
+            try:
+                os.removedirs(subdir_path)  
+            except OSError:  
+                for f in os.listdir(subdir_path):
+                    os.remove(os.path.join(subdir_path, f))
     
 if __name__ == "__main__":
-    count_imgs_data()
+    delete_dataset()
     print("All cleaned up!")
     

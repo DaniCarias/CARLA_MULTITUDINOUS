@@ -63,7 +63,6 @@ weather_types = {
 }
 
 
-
 def weather_environment(weather_type, world):
     
     attrs = weather_types.get(weather_type, weather_types[weather_type])
