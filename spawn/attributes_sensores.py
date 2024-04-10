@@ -1,14 +1,23 @@
 attributes = {
+    # Lidar sem distorção:
+    #'dropoff_general_rate': '0',
+    #'dropoff_intensity_limit': '0',
+    #'dropoff_zero_intensity': '0',
+    #'atmosphere_attenuation_rate': '0',
+    #'noise_stddev': '0'
+    
     "real_lidar": {
-        'channels': '128',                  # Numero de lasers
-        'range': '75.0',                    # Distancia máxima em metros -> 75.0
-        'points_per_second': '2621440',     # Pontos por segundo
-        'rotation_frequency': '20',         # Velocidade de rotação Hz
-        'upper_fov': '45',                  # Qual o ângulo do centro para cima
-        'lower_fov': '-45',                 # Qual o ângulo do centro para baixo
-        'dropoff_general_rate': '0.1',      # Qual a percentagem de pontos que vai descartar
-        'dropoff_intensity_limit': '0.8',   # O que for a baixo do valor de intensidade é descartado 
-        'dropoff_zero_intensity': '0.4'     # Se o valor de intensidade for 0 qual a percentagem de descaratar -> Colocar a 1 para voxel grid
+        'channels': '128',                      # Numero de lasers -> 128
+        'range': '75.0',                        # Distancia máxima em metros -> 75.0
+        'points_per_second': '2621440',         # Pontos por segundo
+        'rotation_frequency': '20',             # Velocidade de rotação Hz -> 20
+        'upper_fov': '45',                      # Qual o ângulo do centro para cima
+        'lower_fov': '-45',                     # Qual o ângulo do centro para baixo
+        'dropoff_general_rate': '0.1',          # Qual a percentagem de pontos que vai descartar -> 0.1
+        'dropoff_intensity_limit': '0.8',       # O que for a baixo do valor de intensidade é descartado -> 0.8
+        'dropoff_zero_intensity': '0.4',        # Se o valor de intensidade for 0 qual a percentagem de descaratar -> 0.4
+        'atmosphere_attenuation_rate': '0.4',   # Atenuação da atmosfera -> 0.4
+        'noise_stddev': '0.1',                  # Desvio padrão do ruído
     },
 }
 

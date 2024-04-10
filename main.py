@@ -36,37 +36,48 @@ def main():
         camera_rgb = spawn_sensor.spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
         actor_list.append(camera_rgb)
         print(f"Camera RGB: {camera_rgb}")
-        
+        """
         camera_depth = spawn_sensor.spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
         actor_list.append(camera_depth)
         print(f"Camera Depth: {camera_depth}")
-        
+        """
         camera_lidar = spawn_sensor.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle)
         actor_list.append(camera_lidar)
-        print(f"Camera Lidar: {camera_lidar}")
+        print(f"Camera Lidar: {camera_lidar}") 
         
+        # Semantic segmentation camera
+        """ semantic_camera = spawn_sensor.spawn_cameras('sensor.camera.semantic_segmentation', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT)
+        actor_list.append(semantic_camera)
+        print(f"Semantic Camera: {semantic_camera}") 
+        
+        image_queue_seg_cam = queue.Queue()
+        semantic_camera.listen(image_queue_seg_cam.put)"""
         
         
         image_queue_rgb = queue.Queue()
-        image_queue_depth = queue.Queue()
+        """image_queue_depth = queue.Queue() """
         image_queue_lidar = queue.Queue()
         
         camera_rgb.listen(image_queue_rgb.put)
-        camera_depth.listen(image_queue_depth.put)
-        camera_lidar.listen(image_queue_lidar.put)
-
+        """camera_depth.listen(image_queue_depth.put)"""
+        camera_lidar.listen(image_queue_lidar.put) 
 
         while True:
             world.tick()
+            
+            # Segmentation camera
+            """ image = image_queue_seg_cam.get()
+            image.save_to_disk('_out/segmentation/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.png',carla.ColorConverter.CityScapesPalette) """
+            
             image = image_queue_rgb.get()
             image.save_to_disk('_out/rgb/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.png')
-            
+            """
             image = image_queue_depth.get()
             cc = carla.ColorConverter.LogarithmicDepth
             image.save_to_disk('_out/depth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.png', cc)
-
+            """
             image = image_queue_lidar.get()
-            image.save_to_disk('_out/lidar/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply')
+            image.save_to_disk('_out/lidar/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply') 
         
 
     finally:

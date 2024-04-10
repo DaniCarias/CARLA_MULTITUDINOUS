@@ -48,21 +48,21 @@ def main():
         
     # Depth 1
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5))
-        camera_depth1 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        camera_depth1 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
         actor_list.append(camera_depth1)
         print(f"Camera Depth1: {camera_depth1}")
 
     # Depth 2
         rotation120 = carla.Rotation(yaw=120.0)
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5), rotation120)
-        camera_depth2 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        camera_depth2 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
         actor_list.append(camera_depth2)
         print(f"Camera Depth2: {camera_depth2}")
         
     # Depth 3
         rotation240 = carla.Rotation(yaw=240.0)
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5), rotation240)
-        camera_depth3 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        camera_depth3 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
         actor_list.append(camera_depth3)
         print(f"Camera Depth3: {camera_depth3}")
         
@@ -82,13 +82,13 @@ def main():
             cc = carla.ColorConverter.LogarithmicDepth
             
             image = image_queue_depth1.get()
-            image.save_to_disk('_out/ground_truth/depth1/%06d' % image.frame + '.png')
+            image.save_to_disk('_out/ground_truth/depth1/%06d' % image.frame + '.png', cc)
             
             image = image_queue_depth2.get()
-            image.save_to_disk('_out/ground_truth/depth2/%06d' % image.frame + '.png')
+            image.save_to_disk('_out/ground_truth/depth2/%06d' % image.frame + '.png', cc)
 
             image = image_queue_depth3.get()
-            image.save_to_disk('_out/ground_truth/depth3/%06d' % image.frame + '.png')
+            image.save_to_disk('_out/ground_truth/depth3/%06d' % image.frame + '.png', cc)
         
 
     finally:
