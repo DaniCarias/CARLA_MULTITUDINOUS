@@ -14,7 +14,7 @@ def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_heig
         attributes_sensores.set_atributes_rgb(camera_bp)
     
     if camera == 'sensor.camera.depth':
-        camera_bp.set_attribute('fov', f"{120}") # Field of view horizontal em graus 120
+        camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus 110
         
     # TEST FOR GROUND TRUTH ------------- WITH ORTHOGRAPHIC MODE
     """ if camera == 'sensor.camera.semantic_segmentation':
