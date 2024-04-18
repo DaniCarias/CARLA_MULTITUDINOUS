@@ -1136,10 +1136,11 @@ class CameraManager(object):
     ##################################################################################################
     ##################################################################################################
             elif item[0].startswith('sensor.lidar'):
-                #self.lidar_range = 75
+                self.lidar_range = 75
                 
-                bp.set_attribute('range', '75')
-                bp.set_attribute('rotation_frequency', '20')
+                bp.set_attribute('rotation_frequency', '6')
+                
+                """bp.set_attribute('range', '50')
                 bp.set_attribute('channels', '128')
                 bp.set_attribute('points_per_second', '2621440')
                 bp.set_attribute('upper_fov', '45')
@@ -1147,7 +1148,7 @@ class CameraManager(object):
                 bp.set_attribute('dropoff_general_rate', '0.1')
                 bp.set_attribute('dropoff_intensity_limit', '0.8')
                 bp.set_attribute('dropoff_zero_intensity', '0.4')
-                bp.set_attribute('atmosphere_attenuation_rate', '0.4')
+                bp.set_attribute('atmosphere_attenuation_rate', '0.4') """
                 
 
 
@@ -1172,7 +1173,7 @@ class CameraManager(object):
         
         if(sensor.startswith('sensor.lidar')):
             #print("- LISTEN...")
-            image.save_to_disk('_out/lidar_teste/%06d.ply' % image.frame)
+            #image.save_to_disk('_out/lidar_teste/%06d.ply' % image.frame)
             world.tick(seconds=3)
 
     def set_sensor(self, index, notify=True, force_respawn=False):
@@ -1192,8 +1193,6 @@ class CameraManager(object):
             #print(f"{self.sensors[index][-1]}  | {self._parent} | {self._camera_transforms[self.transform_index][1]}")
                       
 
-            
-            
             
             self.sensor = self._parent.get_world().spawn_actor(
                 self.sensors[index][-1],
