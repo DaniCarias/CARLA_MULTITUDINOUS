@@ -15,10 +15,6 @@ def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_heig
     
     if camera == 'sensor.camera.depth':
         camera_bp.set_attribute('fov', f"{110}") # Field of view horizontal em graus 110
-        
-    # TEST FOR GROUND TRUTH ------------- WITH ORTHOGRAPHIC MODE
-    """ if camera == 'sensor.camera.semantic_segmentation':
-        camera_bp.set_attribute('orthographic', f"{True}") """
 
     camera_transform = carla.Transform(carla.Location(x=0.9, z=1.3)) # Posição da camera em metros
     camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
