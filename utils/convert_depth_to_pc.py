@@ -1,38 +1,37 @@
 import open3d as o3d
+import math as mt
 import os
 
-def convert_image_to_point_cloud(depth_image_path, rgb_image_path):
+def convert_image_to_point_cloud(depth_image_path, rgb_image_path, imgSizeX=1280, imgSizeY=720, fov=110):
+  # Intrinsics of the camera
+  focus_length = imgSizeX / (2 * mt.tan(fov * mt.pi / 360))
+  centerX = imgSizeX / 2
+  centerY = imgSizeY / 2
 
+  # Get the color and depth images
   color = o3d.io.read_image(rgb_image_path)
   depth = o3d.io.read_image(depth_image_path)
-
+  # Create the RGBD image
   rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(color, depth, convert_rgb_to_intensity = False)
   
+  # Create the point cloud
   point_cloud = o3d.geometry.PointCloud.create_from_rgbd_image(
       rgbd,
       o3d.camera.PinholeCameraIntrinsic(
           width=1280,
           height=720,
-          intrinsic_matrix=[[0.08, 0, 640],
-                            [0, 0.08, 360],
-                            [0, 0, 1]]
+          intrinsic_matrix=[[focus_length, 0, centerX],
+                            [0, focus_length, centerY],
+                            [0,            0,       1]]
       )
   )
   return point_cloud
 
 def main():
-  """Converts all depth images in a folder to a single point cloud and saves it as a .ply file."""
 
   depth_image_folder = "../_out/depth"
   rgb_image_folder = "../_out/rgb"
   
-  camera_intrinsics = {  # Replace with your camera intrinsics
-      "focal_length_x": 0.08,
-      "focal_length_y": 0.08,
-      "principal_point_x": 640,
-      "principal_point_y": 360
-  }
-
   point_cloud = o3d.geometry.PointCloud()
   #for filename in os.listdir(depth_image_folder):
     #if filename.endswith(".png"):  # Adjust for your image format

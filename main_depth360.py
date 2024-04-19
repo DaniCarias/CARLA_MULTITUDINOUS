@@ -46,49 +46,64 @@ def main():
         traffic_manager.ignore_lights_percentage(vehicle, 100)
         
         
-    # Depth 1
+    # Depth & RGB - 1
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5))
         camera_depth1 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
-        actor_list.append(camera_depth1)
-        print(f"Camera Depth1: {camera_depth1}")
+        camera_rgb1 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        actor_list.append([camera_depth1, camera_rgb1])
+        print(f"Camera Depth1: {camera_depth1} | Camera RGB1: {camera_rgb1}")
 
-    # Depth 2
+    # Depth & RGB - 2
         rotation120 = carla.Rotation(yaw=120.0)
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5), rotation120)
         camera_depth2 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
-        actor_list.append(camera_depth2)
-        print(f"Camera Depth2: {camera_depth2}")
+        camera_rgb2 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        actor_list.append([camera_depth2, camera_rgb2])
+        print(f"Camera Depth2: {camera_depth2} | Camera RGB2: {camera_rgb2}")
         
-    # Depth 3
+    # Depth & RGB - 3
         rotation240 = carla.Rotation(yaw=240.0)
         camera_transform = carla.Transform(carla.Location(x=0.9, z=2.5), rotation240)
         camera_depth3 = spawn_cameras('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
-        actor_list.append(camera_depth3)
-        print(f"Camera Depth3: {camera_depth3}")
+        camera_rgb3 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
+        actor_list.append([camera_depth3, camera_rgb3])
+        print(f"Camera Depth3: {camera_depth3} | Camera RGB2: {camera_rgb3}")
         
         
         
         image_queue_depth1 = queue.Queue()
         image_queue_depth2 = queue.Queue()
         image_queue_depth3 = queue.Queue()
+        image_queue_rgb1 = queue.Queue()
+        image_queue_rgb2 = queue.Queue()
+        image_queue_rgb3 = queue.Queue()
         
 
         camera_depth1.listen(image_queue_depth1.put)
         camera_depth2.listen(image_queue_depth2.put)
         camera_depth3.listen(image_queue_depth3.put)
+        camera_rgb1.listen(image_queue_rgb1.put)
+        camera_rgb2.listen(image_queue_rgb2.put)
+        camera_rgb3.listen(image_queue_rgb3.put)
 
         while True:
             world.tick()
             cc = carla.ColorConverter.LogarithmicDepth
             
             image = image_queue_depth1.get()
-            image.save_to_disk('_out/ground_truth/depth1/%06d' % image.frame + '.png', cc)
+            image.save_to_disk('_out/ground_truth/degree_0/depth/%06d' % image.frame + '.png', cc)
+            image = image_queue_rgb1.get()
+            image.save_to_disk('_out/ground_truth/degree_0/rgb/%06d' % image.frame + '.png')
             
             image = image_queue_depth2.get()
-            image.save_to_disk('_out/ground_truth/depth2/%06d' % image.frame + '.png', cc)
+            image.save_to_disk('_out/ground_truth/degree_120/depth/%06d' % image.frame + '.png', cc)
+            image = image_queue_rgb2.get()
+            image.save_to_disk('_out/ground_truth/degree_120/rgb/%06d' % image.frame + '.png')
 
             image = image_queue_depth3.get()
-            image.save_to_disk('_out/ground_truth/depth3/%06d' % image.frame + '.png', cc)
+            image.save_to_disk('_out/ground_truth/degree_240/depth/%06d' % image.frame + '.png', cc)
+            image = image_queue_rgb3.get()
+            image.save_to_disk('_out/ground_truth/degree_240/rgb/%06d' % image.frame + '.png')
         
 
     finally:
