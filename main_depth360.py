@@ -68,9 +68,8 @@ def main():
         camera_rgb3 = spawn_cameras('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, camera_transform)
         actor_list.append([camera_depth3, camera_rgb3])
         print(f"Camera Depth3: {camera_depth3} | Camera RGB2: {camera_rgb3}")
-        
-        
-        
+
+
         image_queue_depth1 = queue.Queue()
         image_queue_depth2 = queue.Queue()
         image_queue_depth3 = queue.Queue()
