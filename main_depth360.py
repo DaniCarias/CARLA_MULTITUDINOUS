@@ -15,6 +15,7 @@ def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_heig
     camera_bp.set_attribute('fov', f"{120}")
     camera_bp.set_attribute('lens_k', f"{0}") # Remove distortion
     camera_bp.set_attribute('lens_kcube', f"{0}") # Remove distortion
+    camera_bp.set_attribute('lens_circle_falloff', f"{0}") # Remove distortion
         
     camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
     return camera
