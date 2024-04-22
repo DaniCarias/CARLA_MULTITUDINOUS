@@ -48,10 +48,6 @@ def create_dataset(num_samples):
     imgs_depth_train_val = imgs_depth[:num_samples_train_val]
     imgs_rgb_train_val = imgs_rgb[:num_samples_train_val]
     imgs_lidar_train_val = imgs_lidar[:num_samples_train_val]
-    print(f"\n-----------TRAIN + VALIDATION-----------")
-    print(f"imgs_depth_train_val: {len(imgs_depth_train_val)}")
-    print(f"imgs_rgb_train_val: {len(imgs_rgb_train_val)}")
-    print(f"imgs_lidar_train_val: {len(imgs_lidar_train_val)}")
     
 
     imgs_train_depth = imgs_depth_train_val[:num_samples_train]

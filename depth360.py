@@ -16,6 +16,7 @@ def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_heig
     camera_bp.set_attribute('lens_k', f"{0}") # Remove distortion
     camera_bp.set_attribute('lens_kcube', f"{0}") # Remove distortion
     camera_bp.set_attribute('lens_circle_falloff', f"{0}") # Remove distortion
+
         
     camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
     return camera
@@ -34,10 +35,7 @@ def main():
         settings.synchronous_mode = True # Enables synchronous mode
         world.apply_settings(settings)
 
-        
-        # "DayClear" | "DayCloudy" | "DayRain" | "NigthCloudy"
-        environment.weather_environment("DayClear", world)
-    
+            
     # Vehicle
         vehicle = spawn_vehicle.spawn_vehicle(world, blueprint_library)
         actor_list.append(vehicle)

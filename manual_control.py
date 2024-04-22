@@ -1138,17 +1138,14 @@ class CameraManager(object):
             elif item[0].startswith('sensor.lidar'):
                 self.lidar_range = 75
                 
-                bp.set_attribute('rotation_frequency', '6')
+                bp.set_attribute('rotation_frequency', '20')
                 
-                """bp.set_attribute('range', '50')
+                bp.set_attribute('range', '75')
                 bp.set_attribute('channels', '128')
                 bp.set_attribute('points_per_second', '2621440')
                 bp.set_attribute('upper_fov', '45')
                 bp.set_attribute('lower_fov', '-45')
-                bp.set_attribute('dropoff_general_rate', '0.1')
-                bp.set_attribute('dropoff_intensity_limit', '0.8')
-                bp.set_attribute('dropoff_zero_intensity', '0.4')
-                bp.set_attribute('atmosphere_attenuation_rate', '0.4') """
+
                 
 
 
