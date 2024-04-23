@@ -5,7 +5,7 @@ def spawn_vehicle(world, blueprint_library):
     bp = blueprint_library.filter('model3')[0]
     
     # Get the spawn point
-    transform = world.get_map().get_spawn_points()[15] #random.randint(0, 30) 
+    transform = world.get_map().get_spawn_points()[random.randint(0, 30)]
     
     vehicle = world.spawn_actor(bp, transform)
     

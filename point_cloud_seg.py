@@ -1,15 +1,22 @@
-import time
-from setup import setup_world, environment
-from spawn import spawn_vehicle
-from spawn import spawn_lidar
-import carla
+from setup import setup_world
+from spawn import spawn_vehicle, spawn_sensor
 import queue
-import math
+
+lidar_attributes = {
+    
+    "real_lidar": {
+        'channels': '128',                      # Numero de lasers -> 128
+        'range': '75.0',                        # Distancia máxima em metros -> 75.0
+        'points_per_second': '1310720',         # Pontos por segundo
+        'rotation_frequency': '10',             # Velocidade de rotação Hz -> 20
+        'upper_fov': '45',                      # Qual o ângulo do centro para cima
+        'lower_fov': '-45',                     # Qual o ângulo do centro para baixo
+    },
+}
+
 
 def main():
     actor_list = []
-    IMG_WIDTH = 1280
-    IMG_HEIGHT = 720
 
     try:
         world, blueprint_library, traffic_manager = setup_world.setup_carla()
@@ -31,24 +38,26 @@ def main():
         
         
     # Lidar Segmentation
-        camera_lidar = spawn.spawn_lidar('sensor.lidar.ray_cast', world, blueprint_library, vehicle)
-        actor_list.append(camera_lidar)
-        print(f"Camera Lidar: {camera_lidar}")
+        sensor_lidar_segm = spawn_sensor.spawn_sensores('sensor.lidar.ray_cast_semantic', world, blueprint_library, vehicle, lidar_attributes)
+        actor_list.append(sensor_lidar_segm)
+        print(f"Camera Lidar: {sensor_lidar_segm}")
 
     
+        image_queue_lidar_segm = queue.Queue()
 
-        image_queue_depth1 = queue.Queue()
-
-        
-
-        camera_depth1.listen(image_queue_depth1.put)
+        sensor_lidar_segm.listen(image_queue_lidar_segm.put)
 
 
         while True:
             world.tick()
             
-            image = image_queue_depth1.get()
-            image.save_to_disk('_out/ground_truth/degree_0/depth/%06d' % image.frame + '.png')
+            image = image_queue_lidar_segm.get()
+            
+            #print(f"Image: {image}")
+            #for detection in image:
+                #print(f"{detection.point} | Object_tag: {detection.object_tag}")
+            
+            image.save_to_disk('_out/lidarSegm/%06d' % image.frame + '.ply')
 
         
 

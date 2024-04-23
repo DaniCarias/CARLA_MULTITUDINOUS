@@ -1,10 +1,7 @@
-import time
-from setup import setup_world, environment
+from setup import setup_world
 from spawn import spawn_vehicle
 import carla
 import queue
-import math
-
 
 def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_height, camera_transform):
     camera_bp = blueprint_library.find(camera)
@@ -108,8 +105,6 @@ def main():
         for actor in actor_list:
             actor.destroy()
         print(f"All cleaned up!")
-
-
 
 
 if __name__ == '__main__':

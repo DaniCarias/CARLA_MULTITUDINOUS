@@ -1,34 +1,50 @@
 import carla
-from spawn import attributes_sensores
 
 
-def spawn_cameras(camera, world, blueprint_library, vehicle, img_width, img_height):
-    camera_bp = blueprint_library.find(camera)
+def set_attributes_lidar(sensor_bp, attributes):
     
-    if camera.startswith('sensor.camera'):
-        # Size of the image to be captured (in pixels).
-        camera_bp.set_attribute('image_size_x', f"{img_width}")
-        camera_bp.set_attribute('image_size_y', f"{img_height}")
-        
-        camera_bp.set_attribute('fov', f"{110}")                 #  Field of view 110 -> Baseado na camera Zed
-        
-        camera_bp.set_attribute('lens_k', f"{0}")                # Remove the distortion
-        camera_bp.set_attribute('lens_kcube', f"{0}")            # Remove the distortion
+    attrs = attributes.get("real_lidar", attributes["real_lidar"])
 
-        if camera == 'sensor.camera.rgb':
-            attributes_sensores.set_atributes_rgb(camera_bp)
+    for attr, value in attrs.items():
+        print(f"LIDAR: {attr} - {value}")
+        sensor_bp.set_attribute(str(attr), str(value))
+        
+def set_atributes_rgb(camera_bp, attributes):
     
-    camera_transform = carla.Transform(carla.Location(x=0.9, z=1.3)) # Posição da camera em metros
-    camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
+    attrs = attributes.get("real_rgb", attributes["real_rgb"])
+
+    for attr, value in attrs.items():
+        print(f"RBG: {attr} - {value}")
+        camera_bp.set_attribute(str(attr), str(value))
+        
+
+def spawn_sensores(sensor, world, blueprint_library, vehicle, attributes):
+    sensor_bp = blueprint_library.find(sensor)
+    
+    if sensor.startswith('sensor.camera'):
+        
+        # Set attributes for the camera (common for rgb and depth)
+        attrs = attributes.get("rgb_and_depth", attributes["rgb_and_depth"])
+        for attr, value in attrs.items():
+            print(f"RBG and Depth: {attr} - {value}")
+            sensor_bp.set_attribute(str(attr), str(value))
+
+        # Set attributes for the rgb camera
+        if sensor == 'sensor.camera.rgb':
+            set_atributes_rgb(sensor_bp, attributes)
+            
+        # Posição da camera em metros
+        sensor_transform = carla.Transform(carla.Location(x=0.9, z=1.3))
+    
+    elif sensor.startswith('sensor.lidar'):
+        # Set attributes for the lidar
+        set_attributes_lidar(sensor_bp, attributes)
+    
+        # Posição do sensor em metros
+        sensor_transform = carla.Transform(carla.Location(x=0, z=2.5)) 
+    
+    
+    camera = world.spawn_actor(sensor_bp, sensor_transform, attach_to=vehicle)
     
     return camera
 
-
-def spawn_lidar(sensor, world, blueprint_library, vehicle):
-    sensor_bp = blueprint_library.find(sensor)
-    
-    attributes_sensores.set_attributes_lidar(sensor_bp)
-    
-    sensor_transform = carla.Transform(carla.Location(x=0, z=2.5)) # Posição do sensor em metros
-    sensor = world.spawn_actor(sensor_bp, sensor_transform, attach_to=vehicle)
-    return sensor
