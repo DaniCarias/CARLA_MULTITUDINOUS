@@ -5,10 +5,10 @@ import queue
 lidar_attributes = {
     
     "real_lidar": {
-        'channels': '128',                      # Numero de lasers -> 128
-        'range': '75.0',                        # Distancia máxima em metros -> 75.0
-        'points_per_second': '1310720',         # Pontos por segundo
-        'rotation_frequency': '10',             # Velocidade de rotação Hz -> 20
+        'channels': '128',                      # Numero de lasers
+        'range': '75.0',                        # Distancia máxima em metros
+        'points_per_second': '2621440',         # Pontos por segundo
+        'rotation_frequency': '20',             # Velocidade de rotação Hz
         'upper_fov': '45',                      # Qual o ângulo do centro para cima
         'lower_fov': '-45',                     # Qual o ângulo do centro para baixo
     },
@@ -22,7 +22,7 @@ def main():
         world, blueprint_library, traffic_manager = setup_world.setup_carla()
         settings = world.get_settings()
         
-        settings.fixed_delta_seconds = 1
+        settings.fixed_delta_seconds = 0.05
         settings.no_rendering_mode = True # No rendering mode
         settings.synchronous_mode = True # Enables synchronous mode
         world.apply_settings(settings)
