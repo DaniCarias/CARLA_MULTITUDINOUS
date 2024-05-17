@@ -4,3 +4,4 @@ data
 _out
 __pycache__
 *.zip
+build/
