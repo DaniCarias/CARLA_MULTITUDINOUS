@@ -4,4 +4,6 @@ data
 _out
 __pycache__
 *.zip
-build/
+build/*
+!build/
+bug/*
