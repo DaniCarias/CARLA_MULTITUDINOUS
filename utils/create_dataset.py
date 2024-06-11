@@ -1,7 +1,6 @@
 import os
 from os import mkdir, listdir
 from shutil import move
-import math
 import os
 from PIL import Image
 
@@ -20,7 +19,7 @@ test_path = f"{data_dir}/test"
 
 def create_folders():
     
-    # Create train and test folders if they don't exist
+    # Create train, validation and test folders if they don't exist
     mkdir(train_path) if not os.path.exists(train_path) else None
     mkdir(validation_path) if not os.path.exists(validation_path) else None
     mkdir(test_path) if not os.path.exists(test_path) else None
@@ -30,12 +29,12 @@ def create_folders():
         mkdir(f"{test_path}/{sensor_folder}") if not os.path.exists(f"{test_path}/{sensor_folder}") else None
 
 def create_dataset(num_samples):
-    # save the depth, rgb and lidar images
+    # Save the depth, rgb and lidar images
     imgs_depth = [f for f in sorted(listdir(f"{out_dir}/depth"))]
     imgs_rgb = [f for f in sorted(listdir(f"{out_dir}/rgb"))]
     imgs_lidar = [f for f in sorted(listdir(f"{out_dir}/lidar"))]
 
-    
+    # Number of samples for train, validation and test
     num_samples_train = int(num_samples*train_ratio)
     num_samples_val = int(num_samples*val_ratio)
     num_samples_test = int(num_samples*test_ratio)

@@ -3,7 +3,6 @@ from spawn import spawn_vehicle, spawn_sensor
 import queue
 
 lidar_attributes = {
-    
     "real_lidar": {
         'channels': '128',                      # Numero de lasers
         'range': '75.0',                        # Distancia máxima em metros
@@ -40,33 +39,23 @@ def main():
     # Lidar Segmentation
         sensor_lidar_segm = spawn_sensor.spawn_sensores('sensor.lidar.ray_cast_semantic', world, blueprint_library, vehicle, lidar_attributes)
         actor_list.append(sensor_lidar_segm)
-        print(f"Camera Lidar: {sensor_lidar_segm}")
+        print(f"Sensor Lidar: {sensor_lidar_segm}")
 
     
         image_queue_lidar_segm = queue.Queue()
 
         sensor_lidar_segm.listen(image_queue_lidar_segm.put)
 
-
         while True:
             world.tick()
             
-            image = image_queue_lidar_segm.get()
-            
-            #print(f"Image: {image}")
-            #for detection in image:
-                #print(f"{detection.point} | Object_tag: {detection.object_tag}")
-            
+            image = image_queue_lidar_segm.get()            
             image.save_to_disk('_out/lidarSegm/%06d' % image.frame + '.ply')
-
-        
 
     finally:
         for actor in actor_list:
             actor.destroy()
         print(f"All cleaned up!")
-
-
 
 
 if __name__ == '__main__':

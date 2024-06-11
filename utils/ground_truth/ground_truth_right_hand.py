@@ -154,21 +154,18 @@ def point2D_to_point3D(image_depth, image_rgb, intrinsic_matrix):
     
 # TESTE
     # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
-    points_mask = np.hstack([p3d, [[0], [0], [0.0]]])
+    points_mask = np.hstack([p3d, [[0], [0], [0]]])
     black_mask = np.zeros((3, p3d.size//3)).astype(np.float64)
     colors_mask = np.hstack([black_mask, [[255], [0], [0]]])
     
+    p3d = np.hstack([p3d, [[0], [0], [0]]])
+    color = np.vstack([color, [255, 0, 0]])
     
-    
-    """ # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
-    p3d = np.hstack([p3d, [[0], [0], [0.0]]])
-    color = np.hstack([color, [[255], [0], [0]]]) """
     
     
 
     # Return [[X...], [Y...], [Z...]] and [[R...], [G...], [B...]] normalized
     return p3d, color, points_mask, colors_mask
-
 
 
 def downsample(points, colors, leaf_size):
