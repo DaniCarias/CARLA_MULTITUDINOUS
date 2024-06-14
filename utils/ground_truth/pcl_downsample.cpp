@@ -41,7 +41,7 @@ extern "C"{
         // Convert to PCLPointCloud2 to apply the VoxelGrid filter
         pcl::toPCLPointCloud2(*cloud_XYZRGB, *cloud);
 
-        std::cout << "PointCloud before filtering: " << cloud->width * cloud->height << " data points (" << pcl::getFieldsList (*cloud) << ")." << std::endl;
+        std::cout << "\nPointCloud before filtering: " << cloud->width * cloud->height << " data points (" << pcl::getFieldsList (*cloud) << ")." << std::endl;
 
         std::cout << "Downsampling with leaf size of " << leaf_size << "... \n";
 

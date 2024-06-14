@@ -28,17 +28,20 @@ def spawn_cameras(world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT):
     front_camera_transform = carla.Transform(carla.Location(z=2.5))
     front_depth_camera = spawn_camera('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, front_camera_transform)
     front_rgb_camera = spawn_camera('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, front_camera_transform)
-    # Depth RIGHT
+    # Depth & RGB RIGHT
     right_camera_transform = carla.Transform(carla.Location(z=2.5), carla.Rotation(yaw=90.0))
     right_depth_camera = spawn_camera('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, right_camera_transform)
-    # Depth LEFT
+    right_rgb_camera = spawn_camera('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, right_camera_transform)
+    # Depth & RGB LEFT
     left_camera_transform = carla.Transform(carla.Location(z=2.5), carla.Rotation(yaw=-90.0))
     left_depth_camera = spawn_camera('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, left_camera_transform)
-    # Depth BACK
+    left_rgb_camera = spawn_camera('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, left_camera_transform)
+    # Depth & RGB BACK
     back_camera_transform = carla.Transform(carla.Location(z=2.5), carla.Rotation(yaw=180.0))
     back_depth_camera = spawn_camera('sensor.camera.depth', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, back_camera_transform)
+    back_rgb_camera = spawn_camera('sensor.camera.rgb', world, blueprint_library, vehicle, IMG_WIDTH, IMG_HEIGHT, back_camera_transform)
         
-    return front_depth_camera, front_rgb_camera, right_depth_camera, left_depth_camera, back_depth_camera
+    return front_depth_camera, front_rgb_camera, right_depth_camera, right_rgb_camera, left_depth_camera, left_rgb_camera, back_depth_camera, back_rgb_camera
 
 
 def get_intrinsic_extrinsic_matrix(camera_depth, image_depth):
@@ -107,11 +110,12 @@ def _depth_to_array(image):
 
     return normalized_depth
 
-def point2D_to_point3D(image_depth, intrinsic_matrix):
+def point2D_to_point3D(image_depth, image_rgb, intrinsic_matrix):
     """
     This function converts a 2D point to a 3D point using image depth, image RGB, and intrinsic matrix.
     
     :param image_depth: The `image_depth` is a 2D image representing the depth information of the scene.
+    :param image_rgb: The `image_rgb` is a 2D image containing color information of the scene.
     :param intrinsic_matrix: The intrinsic matrix is a 3x3 matrix to represents the internal parameters of the depth camera.
     """
     
@@ -123,6 +127,8 @@ def point2D_to_point3D(image_depth, intrinsic_matrix):
     normalized_depth = _depth_to_array(image_depth)
     normalized_depth = np.reshape(normalized_depth, pixel_length)
 
+    color = image_rgb.reshape(pixel_length, 3)
+    
     u_coord = repmat(np.r_[image_depth.width-1:-1:-1],
                      image_depth.height, 1).reshape(pixel_length)
     v_coord = repmat(np.c_[image_depth.height-1:-1:-1],
@@ -135,19 +141,33 @@ def point2D_to_point3D(image_depth, intrinsic_matrix):
     
     depth_in_meters = np.delete(depth_in_meters, max_depth_indexes)
     u_coord = np.delete(u_coord, max_depth_indexes)
-    v_coord = np.delete(v_coord, max_depth_indexes)    
+    v_coord = np.delete(v_coord, max_depth_indexes)
+    color = np.delete(color, max_depth_indexes, axis=0)
+    
     
     # Convert the 2D pixel coordinates to 3D points
     p2d = np.array([u_coord, v_coord, np.ones_like(u_coord)])
     p3d = np.dot(intrinsic_matrix_inv, p2d) * depth_in_meters
     
-    # Add the 0,0,0 point to the point cloud (90º) -> (4 red dots)
-    color = np.full((p3d.shape[1], 3), np.array([0,255,0])) # Green
-    p3d = np.hstack([p3d, [[0], [0], [0]]])
-    color = np.vstack([color, [255, 0, 0]]) # RED
     
-    # Return [[X...], [Y...], [Z...]] and [[R...], [G...], [B...]]
-    return p3d, color
+    
+    
+# TESTE
+    # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
+    points_mask = np.hstack([p3d, [[0], [0], [0.0]]])
+    black_mask = np.zeros((3, p3d.size//3)).astype(np.float64)
+    colors_mask = np.hstack([black_mask, [[255], [0], [0]]])
+    
+    
+    
+    """ # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
+    p3d = np.hstack([p3d, [[0], [0], [0.0]]])
+    color = np.hstack([color, [[255], [0], [0]]]) """
+    
+    
+
+    # Return [[X...], [Y...], [Z...]] and [[R...], [G...], [B...]] normalized
+    return p3d, color, points_mask, colors_mask
 
 
 
@@ -156,14 +176,13 @@ def downsample(points, colors, leaf_size):
     The function `downsample` takes in arrays of points and colors, passes them to a C function for
     downsampling, and returns the downsampled points and colors.
     
-    :param points: Numpy array containing the coordinates of points in a point cloud.
+    :param points: The `points` parameter is expected to be a numpy array containing the coordinates of points in a point cloud.
                    Each row of the array represents a point in 3D space with its x, y, and z coordinates.
-    :param colors: Numpy array containing the RGB of points in a point cloud.
+    :param colors: The `colors` parameter is expected to be a numpy array containing the RGB of points in a point cloud.
                    Each row of the array represents a point in 3D space with its R, G, and B colors.
-    :param leaf_size: Is the size of the leaf for the downsampling algorithm.
-    
-    :return: 'output_points' and 'output_colors' which contain the downsampled points and colors 
-             of the point cloud, respectively.
+    :param leaf_size: The `leaf_size` parameter is the size of the leaf for the downsampling algorithm.
+    :return: The `downsample` function returns two numpy arrays: `output_points` and `output_colors`,
+             which contain the downsampled points and colors of the point cloud, respectively.
     """
     
     pcl_lib = ctypes.cdll.LoadLibrary("./utils/ground_truth/build/libpcl_downsample.so")
@@ -185,6 +204,10 @@ def downsample(points, colors, leaf_size):
     
     # Call the C function to downsample the point cloud
     pcl_lib.pcl_downSample(points, colors, ctypes.c_float(float(leaf_size)), ctypes.c_size_t(points.size//3), output_points, output_colors)
+
+    # Add the 0,0,0 point to the output_points
+    #output_points = np.vstack([output_points, [0, 0, 0.05]])
+    #output_colors = np.vstack([output_colors, [0, 255, 0]])
 
     return output_points, output_colors
 
