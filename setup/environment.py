@@ -49,7 +49,7 @@ weather_types = {
         'air_pollution': 0,
         'dust_storm': 0
     },
-    "NigthCloudy":{
+    "NightCloudy":{
         'precip_deposits': 10,
         'cloudiness': 20,
         'precipitation': 10,

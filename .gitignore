@@ -1,5 +1,6 @@
 *.png
 *.ply
+*.npz
 data
 _out
 __pycache__
