@@ -1,6 +1,7 @@
 from setup import setup_world
 from spawn import spawn_vehicle, spawn_sensor
 import queue
+import open3d as o3d
 
 lidar_attributes = {
     "real_lidar": {
@@ -51,6 +52,16 @@ def main():
             
             image = image_queue_lidar_segm.get()            
             image.save_to_disk('_out/lidarSegm/%06d' % image.frame + '.ply')
+            
+            
+            
+            
+            
+            """ # read the total lines of the file
+            with open('_out/lidarSegm/%06d' % image.frame + '.ply', 'r') as f:
+                lines = f.readlines()
+                print("Total lines: ", len(lines)) """
+            
 
     finally:
         for actor in actor_list:

@@ -135,19 +135,14 @@ def point2D_to_point3D(image_depth, intrinsic_matrix):
     
     depth_in_meters = np.delete(depth_in_meters, max_depth_indexes)
     u_coord = np.delete(u_coord, max_depth_indexes)
-    v_coord = np.delete(v_coord, max_depth_indexes)
-    
-    """ max_depth = np.max(depth_in_meters)
-    print(f"Max depth before downsampling: {max_depth} meters") """
+    v_coord = np.delete(v_coord, max_depth_indexes)    
     
     # Convert the 2D pixel coordinates to 3D points
     p2d = np.array([u_coord, v_coord, np.ones_like(u_coord)])
-    p3d = np.dot(intrinsic_matrix_inv, p2d) * depth_in_meters
+    p3d = np.dot(intrinsic_matrix_inv, p2d) * depth_in_meters    
     
     # Add the 0,0,0 point to the point cloud (90º) -> (4 red dots)
     color = np.full((p3d.shape[1], 3), np.array([0,255,0])) # Green
-    p3d = np.hstack([p3d, [[0], [0], [0]]])
-    color = np.vstack([color, [255, 0, 0]]) # RED
     
     # Return [[X...], [Y...], [Z...]] and [[R...], [G...], [B...]]
     return p3d, color
@@ -180,10 +175,14 @@ def downsample(points, colors, leaf_size):
     
     # put the arrays in a contiguous memory to pass to the C function
     points = np.ascontiguousarray(points, dtype=np.float64)
+    
+# ->>>>>>>>>>>>>>> TIRAR PARA CRIAR DATASET (Inrelevante para os dados) <<<<<<<<<<<<<<<<<<<<-
     colors = np.ascontiguousarray(colors, dtype=np.float64)
     
     # To get the output points and colors of the downsampled point cloud on a clear array
     output_points = np.zeros((points.shape[0], 3)).astype(np.float64)
+    
+# ->>>>>>>>>>>>>>> TIRAR PARA CRIAR DATASET (Inrelevante para os dados) <<<<<<<<<<<<<<<<<<<<-
     output_colors = np.zeros((colors.shape[0], 3)).astype(np.float64)
     
     # Call the C function to downsample the point cloud
@@ -191,6 +190,8 @@ def downsample(points, colors, leaf_size):
 
     # Delete the [0,0,0] points from the point cloud
     output_points = np.delete(output_points, np.where(np.all(output_points == [0,0,0], axis=1)), axis=0)
+    
+# ->>>>>>>>>>>>>>> TIRAR PARA CRIAR DATASET (Inrelevante para os dados) <<<<<<<<<<<<<<<<<<<<-
     output_colors = np.delete(output_colors, np.where(np.all(output_colors == [0,0,0], axis=1)), axis=0)
 
     return output_points, output_colors
