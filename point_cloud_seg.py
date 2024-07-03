@@ -1,5 +1,5 @@
-from setup import setup_world
-from spawn import spawn_vehicle, spawn_sensor
+from utils.setup import setup_world
+from utils.spawn import spawn_vehicle, spawn_sensor
 import queue
 import open3d as o3d
 

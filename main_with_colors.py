@@ -1,6 +1,6 @@
 import time
-from setup import setup_world, environment
-from spawn import spawn_sensor, spawn_vehicle
+from utils.setup import setup_world, environment
+from utils.spawn import spawn_sensor, spawn_vehicle
 from utils.ground_truth import ground_truth_with_colors
 import carla
 import queue
@@ -220,6 +220,13 @@ def get_ground_truth(queue_list, depth_camera_list):
     
     print(f"PointCloud with {front_p3d_world.shape[0] + right_p3d_world.shape[0] + left_p3d_world.shape[0] + back_p3d_world.shape[0]} points")
 
+
+    pcl_360 = o3d.geometry.PointCloud()
+    pcl_360.points = o3d.utility.Vector3dVector(points)
+    pcl_360.colors = o3d.utility.Vector3dVector(np.clip(colors/255, 0, 1))
+    o3d.visualization.draw_geometries([pcl_360])
+
+
     return points, colors, front_extrinsic_matrix, points_mask, colors_mask
 
 
@@ -230,7 +237,7 @@ def main():
     cc = carla.ColorConverter.LogarithmicDepth
 
     try:
-        world, blueprint_library, traffic_manager = setup_world.setup_carla()
+        world, blueprint_library, traffic_manager = setup_world.setup_carla("Town02_Opt")
         
         settings = world.get_settings()
         settings.no_rendering_mode = True # No rendering mode
@@ -306,11 +313,14 @@ def main():
         
 
     # DOWNSAMPLING
-            downsampled_points, downsampled_colors= ground_truth_with_colors.downsample(points, colors, 0.1) #arguments.leaf_size
+            downsampled_points, downsampled_colors= ground_truth_with_colors.downsample(points, colors, 0.2) #arguments.leaf_size
             downsampled_colors = np.clip(downsampled_colors / 255.0, 0, 1)
 
             pcl_downsampled.points = o3d.utility.Vector3dVector(downsampled_points)
             pcl_downsampled.colors = o3d.utility.Vector3dVector(downsampled_colors)
+            
+            o3d.visualization.draw_geometries([pcl_downsampled])
+
             
             
 # TESTE

@@ -2,8 +2,9 @@ import os
 import random
 from os import listdir
 from shutil import move
+from os import mkdir
 
-
+sensor_folders = ["rgb", "depth", "lidar", "ground_truth"]
 metre = "NightCloudy"
 
 out_dir = "../../DataSets_final/"+metre
@@ -17,6 +18,19 @@ test_ratio = 0.1
 train_path = f"{out_dir}/train"
 validation_path = f"{out_dir}/validation"
 test_path = f"{out_dir}/test"
+
+
+def create_folders():
+    # Create folders if they don't exist
+    
+    mkdir(train_path) if not os.path.exists(train_path) else None
+    mkdir(validation_path) if not os.path.exists(validation_path) else None
+    mkdir(test_path) if not os.path.exists(test_path) else None
+    for sensor_folder in sensor_folders:
+        mkdir(f"{train_path}/{sensor_folder}") if not os.path.exists(f"{train_path}/{sensor_folder}") else None
+        mkdir(f"{validation_path}/{sensor_folder}") if not os.path.exists(f"{validation_path}/{sensor_folder}") else None
+        mkdir(f"{test_path}/{sensor_folder}") if not os.path.exists(f"{test_path}/{sensor_folder}") else None
+
 
 def agrupate_data(folder):
     
@@ -39,7 +53,7 @@ def agrupate_data(folder):
     lidar_num = len([f for f in listdir(aux_dir+"/lidar")])
     ground_truth_num = len([f for f in listdir(aux_dir+"/ground_truth")])
     
-    print(f"Aux: {rgb_num} RGB | {depth_num} Depth | {lidar_num} Lidar | {ground_truth_num} Ground Truth")
+    print(f"Total Aux folder: {rgb_num} RGB | {depth_num} Depth | {lidar_num} Lidar | {ground_truth_num} Ground Truth")
 
 
 def main(num_samples):

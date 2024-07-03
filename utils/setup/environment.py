@@ -4,15 +4,15 @@ import carla
 """
     Weather Parameters:
     
-    - precip_deposits  -> Poças de água [0, 100]
-    - cloudiness       -> Nuvens [0, 100]
-    - precipitation    -> Precipitação [0, 100]
+    - precip_deposits  -> Water puddles [0, 100]
+    - cloudiness       -> Clouds [0, 100]
+    - precipitation    -> Precipitation [0, 100]
     - sun_angle        -> Ângulo da altura do sol [-90, 90]
-    - fog              -> Densidade do nevoeiro [0, 100] -> Afeta a visibilidade da camera RGB
-    - wetness          -> Humidade [0, 100] -> Afeta a visibilidade da camera RGB
-    - wind             -> Intensidade do vento [0, 100] -> Muda a direção da chuva e das folhas das árvores
-    - air_pollution    -> Poluição no ar [0, 1]
-    - dust_storm       -> Tempestade de areia [0, 100]
+    - fog              -> Fog density [0, 100]
+    - wetness          -> Wetness [0, 100]
+    - wind             -> Wind [0, 100]
+    - air_pollution    -> Air pollution [0, 1]
+    - dust_storm       -> Dust storm [0, 100]
 """
 
 weather_types = {
@@ -79,5 +79,6 @@ def weather_environment(weather_type, world):
         dust_storm = attrs['dust_storm']
     )
         
-    world.set_weather(weather)  
+    world.set_weather(weather)
+    print(f"Weather: {weather_type}")
     

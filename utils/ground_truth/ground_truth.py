@@ -137,9 +137,6 @@ def point2D_to_point3D(image_depth, intrinsic_matrix):
     u_coord = np.delete(u_coord, max_depth_indexes)
     v_coord = np.delete(v_coord, max_depth_indexes)
     
-    """ max_depth = np.max(depth_in_meters)
-    print(f"Max depth before downsampling: {max_depth} meters") """
-    
     # Convert the 2D pixel coordinates to 3D points
     p2d = np.array([u_coord, v_coord, np.ones_like(u_coord)])
     p3d = np.dot(intrinsic_matrix_inv, p2d) * depth_in_meters

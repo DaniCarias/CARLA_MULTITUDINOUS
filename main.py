@@ -1,17 +1,19 @@
-import argparse
-from setup import setup_world, environment
-from spawn import spawn_sensor, spawn_vehicle
+from utils.setup import setup_world, environment
+from utils.spawn import spawn_sensor, spawn_vehicle
 from utils.ground_truth import ground_truth as ground_truth
+from utils.gennerate_traffic import gennerate_traffic
+import argparse
 import carla
 import queue
 import cv2
 import numpy as np
 import open3d as o3d
 import time
-import math as mt
 
 parser = argparse.ArgumentParser(description="Carla Dataset")
 parser.add_argument('-l', '--leaf_size', type=float, help='Leaf size for downsampling', default=0.2)
+parser.add_argument('-f', '--frames', type=int, help='Number of frames to get data from the sensors', default=750)
+parser.add_argument('-t', '--traffic', type=int, help='Generate traffic', default=0)
 args = parser.parse_args()
 
 
@@ -48,7 +50,6 @@ camera_attributes = {
     },
 }
 
-
 ROUTES_TOWN1 = {
     "route_1": [107, 74, 60, 113],
     "route_2": [0, 105, 76, 86, 104, 87],
@@ -63,10 +64,11 @@ ROUTES_TOWN2 = {
     "route_4": [44, 51, 72, 41, 24, 67]
 }
 
+
 def lidar_transformation(extrinsic, image_queue_lidar):
     """
     The function 'lidar_transformation' transforms raw lidar data into a point cloud, applies various
-    rotations and translations to fit into ground truth point cloud.
+    rotations and translations to fit into ground truth point cloud. Turn into the world coordinates.
     
     :param extrinsic: Represents the extrinsic calibration matrix that describes the transformation between 
                       the lidar sensor and the camera coordinate systems. It is used to calculate the rotation
@@ -199,15 +201,15 @@ def get_ground_truth(queue_list, depth_camera_list):
     return points, colors, front_extrinsic_matrix
 
 
-def occupancy_grid_map(points, voxel_size=0.4, max_range_X_Y=100, max_range_Z=70):
+def occupancy_grid_map(points, voxel_size=0.4, max_range_X_Y=40, min_range_Z=-4, max_range_Z=2.4):
     
     # 100 meters in X and Y (margin of 10 meters) and 70 meters in Z
-    min_bound = np.array([-max_range_X_Y, -max_range_X_Y, -max_range_Z])
+    min_bound = np.array([-max_range_X_Y, -max_range_X_Y, min_range_Z])
     max_bound = np.array([max_range_X_Y, max_range_X_Y, max_range_Z])
     
     # Compute the grid dimensions
     grid_size = np.ceil((max_bound - min_bound) / voxel_size).astype(int)
-    print(f"Grid size: {grid_size[0:3]}")
+    #print(f"Grid size: {grid_size[0:3]}")
     
     # Initialize the occupancy grid
     occupancy_grid = np.zeros(grid_size, dtype=np.int8)
@@ -220,90 +222,37 @@ def occupancy_grid_map(points, voxel_size=0.4, max_range_X_Y=100, max_range_Z=70
         # verify if the point is inside the grid
         if (idx[0] >= 0) and (idx[0] < grid_size[0]) and (idx[1] >= 0) and (idx[1] < grid_size[1]) and (idx[2] >= 0) and (idx[2] < grid_size[2]):
             occupancy_grid[tuple(idx)] = 1
-        
-    """ occupancy_grid[0,0,0] = 1
-    occupancy_grid[749,749,749] = 1
-        
-    # Crop Box -> Z: 70 metres
-    occupancy_grid = occupancy_grid[:, :, :]
-    print(f"occupancy_grid size: {occupancy_grid.shape}") """
-    
+            
     return occupancy_grid
 
 
-def server_settings(world):
-    settings = world.get_settings()
-    settings.no_rendering_mode = True # No rendering mode
-    settings.synchronous_mode = True  # Enables synchronous mode
-    settings.fixed_delta_seconds = 0.05
-    world.apply_settings(settings)
-
-
-def spawn_vehicle_route(world, blueprint_library, traffic_manager, route_map, route_name):
-    spawn_points = world.get_map().get_spawn_points()
     
-    # To print all the spawn points of the map, in the map server
-    """ for i, spawn_point in enumerate(spawn_points):
-            world.debug.draw_string(spawn_point.location, str(i), life_time=240, color=carla.Color(255,0,0)) """
-    
-    # Get the route indices of the route_name
-    route_indices = route_map[route_name]
-    print(f"{str(route_map)}-({route_name}): {route_indices}")
-    
-    # Get the distance between all points in route_indices, in meters
-    total_distance = 0
-    for i in range(len(route_indices) - 1):
-        loc1 = spawn_points[route_indices[i]].location
-        loc2 = spawn_points[route_indices[i+1]].location
-        print(f"Idx: {route_indices[i]} -> {route_indices[i+1]} = {loc1.distance(loc2)} meters")
-        
-        total_distance += loc1.distance(loc2)
-        
-    print(f"Total distance: {mt.ceil(total_distance)} meters")
-    
-    
-    # spawn the vehicle at the starting point
-    vehicle = spawn_vehicle.spawn_vehicle(world, blueprint_library, start_point=route_indices[0])
-    print(f"Vehicle spawned at {route_indices[0]}")
-    
-    route = []
-    for ind in route_indices:
-        route.append(spawn_points[ind].location)
-        
-    # Print the route on the server map
-    """ world.debug.draw_string(spawn_points[21].location, "Starting", life_time=1000, color=carla.Color(255,0,0))
-    for ind in route_1_indices:
-        spawn_points[ind].location
-        world.debug.draw_string(spawn_points[ind].location, str(ind), life_time=1000, color=carla.Color(255,0,0)) """
-    
-    traffic_manager.ignore_lights_percentage(vehicle, 100)  # Ignore all the red ligths
-    traffic_manager.random_left_lanechange_percentage(vehicle, 0)
-    traffic_manager.random_right_lanechange_percentage(vehicle, 0)
-    traffic_manager.auto_lane_change(vehicle, False)
-    traffic_manager.set_path(vehicle, route) # Set the path of the vehicle
-    traffic_manager.update_vehicle_lights(vehicle, True)
-
-    return vehicle
-
-
-
 def main():
     actor_list = []
     pcl_downsampled = o3d.geometry.PointCloud()
     cc = carla.ColorConverter.LogarithmicDepth
+    
+    # "Town01_Opt" | "Town02_Opt"
+    map = "Town01_Opt"
+    
+    # "ROUTES_TOWN1" -> (route_1, route_2, route_3, route_4)
+    # "ROUTES_TOWN2" -> (route_1, route_2, route_3, route_4)
+    route_town, route = ROUTES_TOWN1, "route_1"
+
+    # "DayClear" | "DayCloudy" | "DayRain" | "NightCloudy"
+    weather_type = "DayClear"
 
     try:
-        world, blueprint_library, traffic_manager = setup_world.setup_carla()
-        server_settings(world)
+        world, blueprint_library, traffic_manager = setup_world.setup_carla(map)
+        environment.weather_environment(weather_type, world)
+        
+        vehicle, spawn_point = spawn_vehicle.spawn_vehicle_route(world, blueprint_library, traffic_manager, route_town, route, weather_type)
+        
+        # Gennerate traffic
+        if args.traffic:
+            vehicles_list = gennerate_traffic.gennerate_vehicles(world, traffic_manager, blueprint_library, spawn_point)
+            pedestrians_list, controllers_list = gennerate_traffic.gennerate_pedestrians(world, blueprint_library)
 
-        # "ROUTES_TOWN1" -> (route_1, route_2, route_3, route_4)
-        # "ROUTES_TOWN2" -> (route_1, route_2, route_3, route_4)
-        vehicle = spawn_vehicle_route(world, blueprint_library, traffic_manager, ROUTES_TOWN1, "route_4")
-        
-        # "DayClear" | "DayCloudy" | "DayRain" | "NightCloudy"
-        environment.weather_environment("NightCloudy", world)
-        
-        
         # Spawn RGB, Depth and Lidar sensors
         camera_rgb = spawn_sensor.spawn_sensores('sensor.camera.rgb', world, blueprint_library, vehicle, camera_attributes)
         camera_depth = spawn_sensor.spawn_sensores('sensor.camera.depth', world, blueprint_library, vehicle, camera_attributes)
@@ -311,11 +260,10 @@ def main():
         # Spawn cameras to get the ground truth
         front_depth_camera, front_rgb_camera, right_depth_camera, left_depth_camera, back_depth_camera = ground_truth.spawn_cameras(world, blueprint_library, vehicle, 1280, 960)
         print("Sensors spawned!")
-        
-        
+                
         # Add the actors to the list
         actor_list.extend([vehicle, camera_rgb, camera_depth, camera_lidar, front_depth_camera, front_rgb_camera, right_depth_camera, left_depth_camera, back_depth_camera])
-
+        actor_list += vehicles_list + pedestrians_list
 
     # Queues to get the data
         image_queue_rgb = queue.Queue()
@@ -339,9 +287,14 @@ def main():
         back_depth_camera.listen(image_queue_depth_back.put)
         
 
-        
+        frame = 0
         while cv2.waitKey(1) != ord('q'):
+            
+            if frame == args.frames:
+                break
+                            
             world.tick()
+            frame += 1
 
         # GROUND TRUTH
             queue_list = {"image_queue_rgb_front": image_queue_rgb_front, "image_queue_depth_front": image_queue_depth_front,
@@ -351,22 +304,16 @@ def main():
             depth_camera_list = {"front_depth_camera": front_depth_camera, "right_depth_camera": right_depth_camera, 
                                  "left_depth_camera": left_depth_camera, "back_depth_camera": back_depth_camera}
             
-            points, colors, extrinsic = get_ground_truth(queue_list, depth_camera_list)
-            
-            """ pcl = o3d.geometry.PointCloud()
-            pcl.points = o3d.utility.Vector3dVector(points)
-            pcl.colors = o3d.utility.Vector3dVector(colors) """
-            
+            points, colors, extrinsic = get_ground_truth(queue_list, depth_camera_list)           
 
 
         # DOWNSAMPLING
             downsampled_points, downsampled_colors = ground_truth.downsample(points, colors, args.leaf_size)
             
             
-        # Get the center of the ground truth cameras (Red points)                   
+            # Get the center of the 4 ground truth cameras (Red points)                   
             red_indices = np.where(downsampled_colors[:, 0] == 255)[0]
             red_center_points = downsampled_points[red_indices]
-
             # Get the center of the red points (Coords of the cameras)
             groundtruth_center = np.mean(red_center_points, axis=0)
             
@@ -378,8 +325,7 @@ def main():
         # LIDAR TRANSFORMATION
             lidar_pcl, center_lidar = lidar_transformation(extrinsic, image_queue_lidar)
             
-
-        # Fit the lidar point cloud to the ground truth point cloud
+            # Fit the lidar point cloud to the ground truth point cloud
             translation_to_center = center_lidar - groundtruth_center
             pcl_downsampled.points = o3d.utility.Vector3dVector(np.array(pcl_downsampled.points) + translation_to_center)
             
@@ -397,9 +343,8 @@ def main():
 
 
         # Voxel occupancy grid
-            voxel_occupancy_grid = occupancy_grid_map(np.array(pcl_downsampled.points)) #, args.leaf_size
-            #voxel_occupancy_grid = occupancy_grid_map(pcl_downsampled) #, args.leaf_size
-                       
+            voxel_occupancy_grid = occupancy_grid_map(np.array(pcl_downsampled.points))
+                                   
 
 
     # SAVE THE DATA
@@ -414,15 +359,17 @@ def main():
             o3d.io.write_point_cloud(f'./_out/lidar/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply', lidar_pcl)
         # Save the Ground Truth voxel occupancy grid
             np.savez_compressed('_out/ground_truth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.npz', voxel_occupancy_grid) # Save as compressed .npz
-            o3d.io.write_point_cloud(f'./_out/ground_truth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply', pcl_downsampled)
-            
-            
-            
-        
+            print(f"Data saved!")
 
     finally:
+
         for actor in actor_list:
             actor.destroy()
+            
+        for controller in controllers_list:
+            if controller.is_alive:
+                controller.stop()
+            
         print(f"All cleaned up!")
 
 if __name__ == '__main__':
