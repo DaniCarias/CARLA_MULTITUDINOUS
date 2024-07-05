@@ -76,10 +76,15 @@ python3 visualize_point_cloud.py -G 1
 ```
 
 ## Vehicle routes:
-To create and build routes in Carla Sim
 
+Visualize all the routes in the map to create routes in Carla Sim:
+```
+python3 vehicle_routes.py -a 1
+```
+To create one route, simply create an ordered array with the spawn_points chosen for the route.
+
+
+Display a route on the map:
 ```
 python3 vehicle_routes.py
 ```
-
-
