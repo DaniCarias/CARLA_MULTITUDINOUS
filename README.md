@@ -5,14 +5,27 @@ The main objective of this project is to generate datasets for machine learning 
 
 **This repository explores:**
 * The creation of ground truth of the 3D environment in a voxel occupancy grid, based on depth images.
+* Creating datasets with RGB-D, LiDAR PCL and ground truth
+* Creating datasets with point clouds of segmentation
 * Fix the LiDAR coordinates system.
 * Fix the alignment of the PCL from LiDAR with the ground truth
 * Creating routes for the vehicle to travel
-* Creating datasets with point clouds of segmentation
-* Creating datasets with RGB-D, LiDAR PCL and ground truth
+* Visualize random voxel occupancy grids in point cloud format
+* Visualize a point cloud from file
 
 
-## Create the ground truth from depth images
+<br>
+
+# Quick Start
+### Clone this repository & run the Carla Sim
+```
+git clone https://github.com/DaniCarias/Ground-Truth-Carla-Sim.git
+cd [YOUR-PATH-TO-CARLA]
+.\CarlaUE4.sh
+```
+<br>
+
+# Create the ground truth from depth images
 
 The method chosen to obtain the ground truth was based on depth images. 
 Since the Carla Sim does not allow for a 360º FOV in the depth camera, it was decided to use 4 cameras with a 90º FOV. In this way, the 4 cameras are positioned to cover 360º.
@@ -50,9 +63,49 @@ To locate the 4 point clouds in 3D space, to create a 360º view, we had to mult
 
 Based on this [issue](https://github.com/carla-simulator/carla/issues/6719)
 
+<br>
 
+# Generate RGB-D, LiDAR PCL, and voxel occupancy grid DataSet
+```
+python3 main.py
+```
 
-## Fix the LiDAR coordinates system
+#### You can define...
+* The frame interval for generating the DataSet (default = 750):
+```
+python3 main.py -f 1000
+```
+* The leaf size you want to downsample the Point Cloud (default = 0.2 (20cm)):  
+```
+python3 main.py -l 0.4
+```
+* If you want to generate traffic or not (default = 0):
+```
+python3 main.py -t 1
+```
+* The map (default = Town01_Opt):
+```
+python3 main.py -m Town02_Opt
+```
+* The route (default = route_1):
+```
+python3 main.py -r route_2
+```
+
+### To stop earlier
+If you want to finish click on the `"Q"` key to destroy the actors and to avoid the risk of having a different number of samples for some type of data.
+
+<br>
+
+# Generate segmentation point clouds DataSets
+
+```
+python3 point_cloud_seg.py
+```
+
+<br>
+
+# Fix the LiDAR coordinates system
 
 The point cloud obtained from the LiDAR sensor does not follow the same coordinate system as the other sensors and cameras, since it follows the right-hand coordinate system, and the world in the simulator itself follows the left-hand system, causing the two point clouds (LiDAR and ground truth) to be "mirrored" on the Y axis.
 
@@ -62,9 +115,9 @@ To solve this problem, translations and rotations are made in the LiDAR point cl
 
 Based on this [issue](https://github.com/carla-simulator/carla/issues/392)
 
+<br>
 
-
-## Fix the alignment of the PCL from LiDAR with the ground truth
+# Fix the alignment of the PCL from LiDAR with the ground truth
 
 The ground truth point cloud is generated from 4 depth cameras, theoretically positioned in the same location, guaranteeing a common spatial reference.
   
@@ -74,9 +127,9 @@ It was therefore necessary to obtain the theoretical center of the four cameras.
 
 ![pontos_camaras](https://github.com/DaniCarias/Carla_sim_proj_infor/assets/93714772/23c72103-a358-4779-87e5-1d57d00f87d3)
 
+<br>
 
-
-## Creating routes for the vehicle to travel
+# Creating routes for the vehicle to travel
 
 In order to be able to compare the results obtained in different types of datasets, more or less complex, specific routes were created for the vehicle to circulate, so that we can change the weather, for example, and see, from the results obtained, how much this factor penalizes the model's performance or not, without being influenced by the route the vehicle takes.
 
@@ -88,11 +141,52 @@ Like this:
 
 ![Town1_routes](https://github.com/DaniCarias/Carla_sim_proj_infor/assets/93714772/4587f013-29d8-4193-9fcb-dd7383b13898)
 
+## Vehicle routes:
+
+Visualize all the routes in the map to create routes in Carla Sim:
+```
+python3 vehicle_routes.py -a 1
+```
+To create one route, simply create an ordered array with the spawn_points chosen for the route.
+
+
+Display a route on the map:
+```
+python3 vehicle_routes.py
+```
+
 Based on Carla Sim [documentation](https://carla.readthedocs.io/en/0.9.14/tuto_G_traffic_manager/) in "Specify routes for vehicles" section
 
+<br>
 
+# To visualize 20 random voxel occupancy grids:
 
+Just change the path to get the voxel files in the visualize_voxel_grid.py code...
+```
+cd utils/visualize
 
+python3 visualize_voxel_grid.py
+```
+<br>
+
+# To visualize a point cloud:
+Just change the path to get the point clouds in the visualize_point_cloud.py code...
+```
+cd utils/visualize
+```
+
+To view a LiDAR PCL:
+```
+python3 visualize_point_cloud.py -L 1
+```
+To view a segmentation PCL:
+```
+python3 visualize_point_cloud.py -S 1
+```
+To view a ground truth PCL:
+```
+python3 visualize_point_cloud.py -G 1
+```
 
 
 
