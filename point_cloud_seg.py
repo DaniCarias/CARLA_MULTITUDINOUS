@@ -52,10 +52,7 @@ def main():
             
             image = image_queue_lidar_segm.get()            
             image.save_to_disk('_out/lidarSegm/%06d' % image.frame + '.ply')
-            
-            
-            
-            
+
             
             """ # read the total lines of the file
             with open('_out/lidarSegm/%06d' % image.frame + '.ply', 'r') as f:

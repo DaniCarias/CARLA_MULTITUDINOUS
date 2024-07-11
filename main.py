@@ -14,6 +14,8 @@ parser = argparse.ArgumentParser(description="Carla Dataset")
 parser.add_argument('-l', '--leaf_size', type=float, help='Leaf size for downsampling', default=0.2)
 parser.add_argument('-f', '--frames', type=int, help='Number of frames to get data from the sensors', default=750)
 parser.add_argument('-t', '--traffic', type=int, help='Generate traffic', default=0)
+parser.add_argument('-m', '--map', type=str, help='Map', default="Town01_Opt")
+parser.add_argument('-r', '--route', type=str, help='Route', default="route_1")
 args = parser.parse_args()
 
 
@@ -202,14 +204,29 @@ def get_ground_truth(queue_list, depth_camera_list):
 
 
 def occupancy_grid_map(points, voxel_size=0.4, max_range_X_Y=40, min_range_Z=-4, max_range_Z=2.4):
+    """
+    A function that generates an occupancy grid map based on the input points, voxel size, and grid dimensions. 
+    It initializes the grid, converts the point cloud to voxel coordinates, and marks the occupied voxels.
     
-    # 100 meters in X and Y (margin of 10 meters) and 70 meters in Z
+    Parameters:
+    - points: numpy array, representing the input points
+    - voxel_size: float, the size of each voxel
+    - max_range_X_Y: int, the maximum range in X and Y axes
+    - min_range_Z: int, the minimum range in the Z axis
+    - max_range_Z: float, the maximum range in the Z axis
+    
+    Returns:
+    - occupancy_grid: numpy array, the final occupancy grid map
+    """
+    
+    
+    
+    # 80 meters in X and Y and 6.4 meters in Z
     min_bound = np.array([-max_range_X_Y, -max_range_X_Y, min_range_Z])
     max_bound = np.array([max_range_X_Y, max_range_X_Y, max_range_Z])
     
     # Compute the grid dimensions
     grid_size = np.ceil((max_bound - min_bound) / voxel_size).astype(int)
-    #print(f"Grid size: {grid_size[0:3]}")
     
     # Initialize the occupancy grid
     occupancy_grid = np.zeros(grid_size, dtype=np.int8)
@@ -233,11 +250,12 @@ def main():
     cc = carla.ColorConverter.LogarithmicDepth
     
     # "Town01_Opt" | "Town02_Opt"
-    map = "Town01_Opt"
+    map = args.map
     
     # "ROUTES_TOWN1" -> (route_1, route_2, route_3, route_4)
     # "ROUTES_TOWN2" -> (route_1, route_2, route_3, route_4)
-    route_town, route = ROUTES_TOWN1, "route_1"
+    route_town = ROUTES_TOWN1 if map == "Town01_Opt" else ROUTES_TOWN2
+    route = args.route
 
     # "DayClear" | "DayCloudy" | "DayRain" | "NightCloudy"
     weather_type = "DayClear"
@@ -263,7 +281,8 @@ def main():
                 
         # Add the actors to the list
         actor_list.extend([vehicle, camera_rgb, camera_depth, camera_lidar, front_depth_camera, front_rgb_camera, right_depth_camera, left_depth_camera, back_depth_camera])
-        actor_list += vehicles_list + pedestrians_list
+        if args.traffic:
+            actor_list += vehicles_list + pedestrians_list
 
     # Queues to get the data
         image_queue_rgb = queue.Queue()

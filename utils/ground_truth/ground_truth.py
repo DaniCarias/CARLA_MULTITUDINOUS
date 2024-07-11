@@ -76,6 +76,10 @@ def get_intrinsic_extrinsic_matrix(camera_depth, image_depth):
     centerX = image_depth.width / 2
     centerY = image_depth.height / 2
 
+    intrinsic_matrix = [[focal_lengthX,  0,       centerX],
+                        [0,        focal_lengthX, centerY],
+                        [0,              0,          1   ]]
+    
     intrinsic_matrix = [[focal_lengthX, 0, centerX],
                         [0, focal_lengthX, centerY],
                         [0, 0, 1]]

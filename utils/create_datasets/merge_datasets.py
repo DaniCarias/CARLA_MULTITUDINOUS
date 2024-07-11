@@ -5,7 +5,7 @@ import os
 target_base_folder = "../../merged_dataset"
 datasets_path = "../../../../../DataSets_200x200x16"
 
-# Define the main folders
+# What type of weather to merge
 main_folders = ['DayClear', 'DayRain', 'DayCloudy', 'NightCloudy']
 
 # Define subfolders and categories
@@ -37,13 +37,9 @@ def copy_files(source, destination):
         full_file_name = os.path.join(source, file_name)
         if os.path.isfile(full_file_name):
             shutil.copy(full_file_name, destination)
-        else:
-            print(f"Skipping directory: {full_file_name}")
-
-
 
 if __name__ == "__main__":
-    #create_target()
+    create_target()
     
     # Iterate over each main folder and copy its contents to the target base folder
     for main_folder in main_folders:
@@ -53,3 +49,4 @@ if __name__ == "__main__":
                 target_folder = os.path.join(target_base_folder, subfolder, category)
                 if os.path.exists(source_folder):
                     copy_files(source_folder, target_folder)
+                    

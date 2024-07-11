@@ -15,16 +15,16 @@ args = parser.parse_args()
 def main():
 
     if args.ground_truth:
-        cloud1 = o3d.io.read_point_cloud(glob.glob('../../_out/lidar/*.ply')[0])        # Lidar
-        cloud2 = o3d.io.read_point_cloud(glob.glob('../../_out/ground_truth/*.ply')[0]) # Ground Truth
-        visualization.draw_geometries([cloud2])    # Visualize point cloud
-        visualization.draw_geometries([cloud1])    # Visualize point cloud
+        lidar_cloud = o3d.io.read_point_cloud(glob.glob('../../_out/lidar/*.ply')[0])        # Lidar
+        ground_truth_cloud = o3d.io.read_point_cloud(glob.glob('../../_out/ground_truth/*.ply')[0]) # Ground Truth
+        visualization.draw_geometries([ground_truth_cloud])    # Visualize point cloud
+        visualization.draw_geometries([lidar_cloud])    # Visualize point cloud
     elif args.lidar:
-        cloud = o3d.io.read_point_cloud(glob.glob('../../_out/lidar/*.ply')[0])        # Lidar
-        visualization.draw_geometries([cloud])    # Visualize point cloud
+        lidar_cloud = o3d.io.read_point_cloud(glob.glob('../../_out/lidar/*.ply')[0])        # Lidar
+        visualization.draw_geometries([lidar_cloud])    # Visualize point cloud
     elif args.segmentation:
-        cloud = o3d.io.read_point_cloud(glob.glob('../../_out/lidarSegm/*.ply')[0])    # Segmentation
-        visualization.draw_geometries([cloud])    # Visualize point cloud
+        lidarSegm_cloud = o3d.io.read_point_cloud(glob.glob('../../_out/lidarSegm/*.ply')[0])    # Segmentation
+        visualization.draw_geometries([lidarSegm_cloud])    # Visualize point cloud
     
     
 
