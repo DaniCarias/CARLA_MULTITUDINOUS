@@ -16,10 +16,13 @@ The main objective of this project is to generate datasets for machine learning 
 
 <br>
 
-# Quick Start
+## Install and run CARLA Sim
+### Install CARLA Sim
+You need to follow the steps for installing the CARLA Sim simulator at this link: https://carla.readthedocs.io/en/latest/start_quickstart/
+
 ### Clone this repository & run the Carla Sim
 ```
-git clone https://github.com/DaniCarias/Ground-Truth-Carla-Sim.git
+git clone https://github.com/DaniCarias/Carla_sim_proj_infor.git
 cd [YOUR-PATH-TO-CARLA]
 .\CarlaUE4.sh
 ```
