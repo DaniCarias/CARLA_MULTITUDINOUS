@@ -11,7 +11,7 @@ def server_settings(world):
     - world: the world object on which to apply the settings
     """
     settings = world.get_settings()
-    settings.no_rendering_mode = False # No rendering mode
+    settings.no_rendering_mode = True # No rendering mode
     settings.synchronous_mode = True  # Enables synchronous mode
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
@@ -46,7 +46,7 @@ def setup_carla(map):
         pass
 
     client = carla.Client('localhost', 2000)
-    client.set_timeout(7.0)
+    client.set_timeout(10.0)
 
     world = client.get_world()
 

@@ -8,8 +8,8 @@ sensor_folders = ["rgb", "depth", "lidar", "ground_truth"]
 metre = "NightCloudy"
 
 out_dir = "../../DataSets_final/"+metre
-in_dir = "../../DataSets_validados/"+metre
-aux_dir = "../../DataSets_validados/"+metre+"/aux"
+in_dir = "../../valid_DataSets/"+metre
+aux_dir = "../../valid_DataSets/"+metre+"/aux"
 
 train_ratio = 0.7
 val_ratio = 0.2

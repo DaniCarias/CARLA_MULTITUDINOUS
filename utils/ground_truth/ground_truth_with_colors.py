@@ -148,26 +148,10 @@ def point2D_to_point3D(image_depth, image_rgb, intrinsic_matrix):
     # Convert the 2D pixel coordinates to 3D points
     p2d = np.array([u_coord, v_coord, np.ones_like(u_coord)])
     p3d = np.dot(intrinsic_matrix_inv, p2d) * depth_in_meters
-    
-    
-    
-    
-# TESTE
-    # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
-    points_mask = np.hstack([p3d, [[0], [0], [0.0]]])
-    black_mask = np.zeros((3, p3d.size//3)).astype(np.float64)
-    colors_mask = np.hstack([black_mask, [[255], [0], [0]]])
-    
-    
-    
-    """ # Add the 0,0,0 point to the point cloud (90º) -> 4 red dots
-    p3d = np.hstack([p3d, [[0], [0], [0.0]]])
-    color = np.hstack([color, [[255], [0], [0]]]) """
-    
-    
+      
 
     # Return [[X...], [Y...], [Z...]] and [[R...], [G...], [B...]] normalized
-    return p3d, color, points_mask, colors_mask
+    return p3d, color
 
 
 
@@ -204,10 +188,6 @@ def downsample(points, colors, leaf_size):
     
     # Call the C function to downsample the point cloud
     pcl_lib.pcl_downSample(points, colors, ctypes.c_float(float(leaf_size)), ctypes.c_size_t(points.size//3), output_points, output_colors)
-
-    # Add the 0,0,0 point to the output_points
-    #output_points = np.vstack([output_points, [0, 0, 0.05]])
-    #output_colors = np.vstack([output_colors, [0, 255, 0]])
 
     return output_points, output_colors
 

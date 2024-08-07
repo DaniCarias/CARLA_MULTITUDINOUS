@@ -21,32 +21,32 @@ args = parser.parse_args()
 
 lidar_attributes = {
     "real_lidar": {
-        'channels': '128',                      # Numero de lasers -> 128
-        'range': '75.0',                        # Distancia máxima em metros -> 75.0
-        'points_per_second': '2621440',         # Pontos por segundo
-        'rotation_frequency': '20',             # Velocidade de rotação Hz -> 20
-        'upper_fov': '45',                      # Qual o ângulo do centro para cima
-        'lower_fov': '-45',                     # Qual o ângulo do centro para baixo
-        'dropoff_general_rate': '0.1',          # Qual a percentagem de pontos que vai descartar -> 0.1
-        'dropoff_intensity_limit': '0.8',       # O que for a baixo do valor de intensidade é descartado -> 0.8
-        'dropoff_zero_intensity': '0.4',        # Se o valor de intensidade for 0 qual a percentagem de descaratar -> 0.4
-        'atmosphere_attenuation_rate': '0.4',   # Atenuação da atmosfera -> 0.4
+        'channels': '128',                      # Number of channels -> Based on LiDAR OS0
+        'range': '75.0',                        # Max range in meters -> Based on LiDAR OS0
+        'points_per_second': '2621440',         # Points per second -> Based on LiDAR OS0
+        'rotation_frequency': '20',             # Rotation frequency -> Based on LiDAR OS0
+        'upper_fov': '45',                      # Upper field of view in degrees -> Based on LiDAR OS0
+        'lower_fov': '-45',                     # Lower field of view in degrees -> Based on LiDAR OS0
+        'dropoff_general_rate': '0.1',          # Dropoff general rate
+        'dropoff_intensity_limit': '0.8',       # Dropoff intensity limit
+        'dropoff_zero_intensity': '0.4',        # Dropoff zero intensity
+        'atmosphere_attenuation_rate': '0.4',   # Atmosphere attenuation rate
     },
 }
 
 camera_attributes = {
     "real_rgb": {
-        'fov': '110',                    # Field of view horizontal em graus 110 -> Baseado na camera Zed   
-        'fstop': '0.5',                  # Abertura da lente -> 1/2 -> Baseado na camera Zed
-        'iso': '1900',                   # Sensitivity do sensor -> Baseado na camera Zed
-        'focal_distance': '2000',        # Distância a que a profundidade do efeito de campo deve ser nítida.     
-        'motion_blur_intensity': '0.1',  # Intensidade do efeito de movimento
+        'fov': '110',                    # Field of view horizontal in degrees 110 -> Based on Zed 2i camera
+        'fstop': '0.5',                  # Aperture -> 1/2 -> Based on Zed 2i camera
+        'iso': '1900',                   # Sensitivity -> Based on Zed 2i camera
+        'focal_distance': '2000',        # Distance to the focal point     
+        'motion_blur_intensity': '0.1',  # Intensity of the motion blur
     },
         
     "rgb_and_depth": {
         'image_size_x': '1280',
         'image_size_y': '720',
-        'fov': '110',                  # Field of view horizontal em graus 110 -> Baseado na camera Zed
+        'fov': '110',                  # Field of view horizontal in degrees 110 -> Based on Zed 2i camera
         'lens_k': '0',                 # Remove the distortion
         'lens_kcube': '0',             # Remove the distortion
     },
@@ -140,6 +140,15 @@ def lidar_transformation(extrinsic, image_queue_lidar):
     return lidar_pcl, center_lidar
         
         
+""" def update_image(vis, image):
+    # Convert OpenCV image to Open3D image
+    open3d_img = o3d.geometry.Image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    vis.clear_geometries()
+    vis.add_geometry(open3d_img)
+
+    return False """
+        
 def get_ground_truth(queue_list, depth_camera_list):
     """
     The function 'get_ground_truth' processes depth images from multiple cameras to generate a point cloud.
@@ -162,6 +171,10 @@ def get_ground_truth(queue_list, depth_camera_list):
     front_rbg_image = queue_list['image_queue_rgb_front'].get()
     front_rbg_image = np.reshape(np.copy(front_rbg_image.raw_data), (front_rbg_image.height, front_rbg_image.width, 4))
     cv2.imshow('RGB Camera Front Output', front_rbg_image)
+
+    """ update_image(vis, front_rbg_image)
+    vis.poll_events()
+    vis.update_renderer() """
 
     # Get the intrinsic and extrinsic matrix of the 4 cameras
     front_intrinsic_matrix, front_extrinsic_matrix = ground_truth.get_intrinsic_extrinsic_matrix(depth_camera_list['front_depth_camera'], front_depth_image)
@@ -257,8 +270,8 @@ def main():
     route_town = ROUTES_TOWN1 if map == "Town01_Opt" else ROUTES_TOWN2
     route = args.route
 
-    # "DayClear" | "DayCloudy" | "DayRain" | "NightCloudy"
-    weather_type = "DayClear"
+    # Options: "DayClear" | "DayCloudy" | "DayRain" | "NightCloudy"
+    weather_type = "NightCloudy"
 
     try:
         world, blueprint_library, traffic_manager = setup_world.setup_carla(map)
@@ -281,6 +294,7 @@ def main():
                 
         # Add the actors to the list
         actor_list.extend([vehicle, camera_rgb, camera_depth, camera_lidar, front_depth_camera, front_rgb_camera, right_depth_camera, left_depth_camera, back_depth_camera])
+        actor_list.extend([vehicle, camera_rgb, camera_depth])
         if args.traffic:
             actor_list += vehicles_list + pedestrians_list
 
@@ -306,9 +320,13 @@ def main():
         back_depth_camera.listen(image_queue_depth_back.put)
         
 
+        #vis = o3d.visualization.Visualizer()
+        #vis.create_window()
+
         frame = 0
         while cv2.waitKey(1) != ord('q'):
-            
+        #while True:
+                        
             if frame == args.frames:
                 break
                             
@@ -363,7 +381,6 @@ def main():
 
         # Voxel occupancy grid
             voxel_occupancy_grid = occupancy_grid_map(np.array(pcl_downsampled.points))
-                                   
 
 
     # SAVE THE DATA
@@ -375,12 +392,16 @@ def main():
             image = image_queue_depth.get()
             image.save_to_disk('_out/depth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.png', cc)
         # Save the Lidar point cloud
-            o3d.io.write_point_cloud(f'./_out/lidar/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply', lidar_pcl)
+            o3d.io.write_point_cloud(f'./_out/lidar/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply', lidar_pcl) # To save the point cloud file (unreliable points)
+            np.savez_compressed('_out/lidar_points/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.npz', np.asarray(lidar_pcl.points)) # Save as compressed .npz
         # Save the Ground Truth voxel occupancy grid
-            np.savez_compressed('_out/ground_truth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.npz', voxel_occupancy_grid) # Save as compressed .npz
+            o3d.io.write_point_cloud(f'./_out/ground_truth/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.ply', pcl_downsampled) # To save the point cloud file (unreliable points)
+            np.savez_compressed('_out/ground_truth_voxel/' + time.strftime('%Y%m%d_%H%M%S') + '_%06d' % image.frame + '.npz', voxel_occupancy_grid) # Save as compressed .npz
             print(f"Data saved!")
 
     finally:
+
+        #vis.close()
 
         for actor in actor_list:
             actor.destroy()

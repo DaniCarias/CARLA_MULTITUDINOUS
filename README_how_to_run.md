@@ -9,29 +9,29 @@ cd [YOUR-PATH-TO-CARLA]
 
 ## Generate RGB-D, LiDAR PCL, and voxel occupancy grid DataSets
 ```
-python3 main.py
+python3 main_dataset.py
 ```
 
 #### You can define...
 * The frame interval for generating the DataSet (default = 750):
 ```
-python3 main.py -f 1000
+python3 main_dataset.py -f 1000
 ```
 * The leaf size you want to downsample the Point Cloud (default = 0.2 (20cm)):  
 ```
-python3 main.py -l 0.4
+python3 main_dataset.py -l 0.4
 ```
 * If you want to generate traffic or not (default = 0):
 ```
-python3 main.py -t 1
+python3 main_dataset.py -t 1
 ```
 * The map (default = Town01_Opt):
 ```
-python3 main.py -m Town02_Opt
+python3 main_dataset.py -m Town02_Opt
 ```
 * The route (default = route_1):
 ```
-python3 main.py -r route_2
+python3 main_dataset.py -r route_2
 ```
 
 ### To stop earlier
@@ -45,11 +45,16 @@ python3 point_cloud_seg.py
 ```
 
 
-
 ## Visualize
 
-### To visualize 20 random voxel occupancy grids:
-Just change the path to get the voxel files in the visualize_voxel_grid.py code...
+### To visualize the Ground Truth every frame of the simulation:
+
+```
+python3 ground_truth.py
+```
+
+### To visualize 1 random voxel occupancy grid:
+
 ```
 cd utils/visualize
 
@@ -57,7 +62,7 @@ python3 visualize_voxel_grid.py
 ```
 
 ### To visualize a point cloud:
-Just change the path to get the point clouds in the visualize_point_cloud.py code...
+
 ```
 cd utils/visualize
 ```
@@ -84,7 +89,7 @@ python3 vehicle_routes.py -a 1
 To create one route, simply create an ordered array with the spawn_points chosen for the route.
 
 
-Display a route on the map:
+Display a route (array of spawn_points) on the CARLA Sim:
 ```
 python3 vehicle_routes.py
 ```

@@ -11,4 +11,4 @@ build
 main_with_colors.py
 ground_truth_with_colors.py
 merged_dataset
-DataSets_validados
+valid_DataSets

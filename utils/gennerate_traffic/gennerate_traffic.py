@@ -1,7 +1,7 @@
 import carla
 import random
 
-def gennerate_vehicles(world, traffic_manager, blueprint_library, vehicle_spawn_point, number_of_vehicles=40):
+def gennerate_vehicles(world, traffic_manager, blueprint_library, vehicle_spawn_point, number_of_vehicles=70):
     vehicles_list = []
     
     spawn_points = world.get_map().get_spawn_points()
@@ -25,7 +25,7 @@ def gennerate_vehicles(world, traffic_manager, blueprint_library, vehicle_spawn_
     return vehicles_list
 
 
-def gennerate_pedestrians(world, blueprint_library, number_of_pedestrians=20):
+def gennerate_pedestrians(world, blueprint_library, number_of_pedestrians=50):
     pedestrians_list = []
     controllers_list = []
     spawn_points = []
