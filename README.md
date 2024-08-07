@@ -20,12 +20,50 @@ The main objective of this project is to generate datasets for machine learning 
 ### Install CARLA Sim
 You need to follow the steps for installing the CARLA Sim simulator at this link: https://carla.readthedocs.io/en/latest/start_quickstart/
 
-### Clone this repository & run the Carla Sim
+## Run the scripts
+### Option A:
+1. Clone this repository 
 ```
 git clone https://github.com/DaniCarias/Carla_sim_proj_infor.git
+```
+2. Install all the dependencies:
+```
+pip install carla==0.9.15
+pip install numpy
+pip install open3d-cpu
+pip install opencv-python
+pip install --no-cache-dir pcl
+pip install pygame
+pip install Pillow
+apt install -y cmake libpcl-dev
+```
+3. Build the c++ code
+```
+cd utils/ground_truth/build
+cmake ..
+make
+```
+
+OR
+
+### Option B:
+1. Enable Display of GUI
+```
+xhost +
+export DISPLAY=:1    # or 0
+```
+2. Build a Docker container with the Dockerfile of this repository
+```
+sudo docker build -t carla_script .
+sudo docker run -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host carla_script
+```
+
+### Run the Carla Sim
+```
 cd [YOUR-PATH-TO-CARLA]
 .\CarlaUE4.sh
 ```
+
 <br>
 
 # Create the ground truth from depth images
