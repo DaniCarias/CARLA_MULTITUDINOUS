@@ -1,4 +1,4 @@
-# Need run the command "xhost +" in bash to be able to display GUI applications in docker and maybe "export DISPLAY=:0.0"
+# Need run the command "xhost +" in bash to be able to display GUI applications in docker and maybe "export DISPLAY=:1"
 # BUILD: sudo docker build -t carla_script .
 # RUN: sudo docker run -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host carla_script
 
